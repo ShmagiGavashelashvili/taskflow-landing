@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { BURNDOWN_ACTUAL, BURNDOWN_IDEAL, KPIS, VELOCITY } from "@/constants/mockups";
+import { BURNDOWN_ACTUAL, BURNDOWN_IDEAL, KPIS, VELOCITY } from "./reports.data";
 import ReportsMockup from "./ReportsMockup";
 
 describe("ReportsMockup", () => {

@@ -1,8 +1,10 @@
-import { COPYRIGHT_YEAR, NEWSLETTER_INPUT_ID } from "@/constants/site";
+import { COPYRIGHT_YEAR } from "@/constants/site";
 import { footerColumns, socialLinks } from "@/data";
 import { BRAND_ICONS } from "./icons/BrandIcons";
 import EmailCapture from "./ui/EmailCapture";
 import Logo from "./ui/Logo";
+
+const NEWSLETTER_INPUT_ID = "newsletter-email";
 
 export default function Footer() {
   return (

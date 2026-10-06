@@ -1,19 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { BOARD_COLUMNS, TIMELINE_DAYS, TIMELINE_ROWS, VELOCITY } from "./mockups";
-import { BILLING_OPTIONS } from "./pricing";
-import { AVATAR_GRADIENTS, AVATAR_SIZE_CLASSES, BADGE_TONE_CLASSES, BAR_TONE_CLASSES } from "./ui";
+import { BOARD_COLUMNS } from "./board.data";
+import { VELOCITY } from "./reports.data";
+import { TIMELINE_DAYS, TIMELINE_ROWS } from "./timeline.data";
 
-describe("constants", () => {
-  it("offers monthly then yearly billing", () => {
-    expect(BILLING_OPTIONS.map((o) => o.value)).toEqual(["monthly", "yearly"]);
-  });
-
-  it("has a class for every avatar gradient slot, size and tone", () => {
-    expect(AVATAR_GRADIENTS).toHaveLength(5);
-    expect(Object.keys(AVATAR_SIZE_CLASSES).sort()).toEqual(["lg", "md", "sm", "xl"]);
-    expect(Object.keys(BADGE_TONE_CLASSES).sort()).toEqual(Object.keys(BAR_TONE_CLASSES).sort());
-  });
-
+describe("mockup data", () => {
   it("keeps timeline rows inside the day grid", () => {
     for (const row of TIMELINE_ROWS) {
       expect(row.start).toBeGreaterThanOrEqual(1);

@@ -3,10 +3,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useState } from "react";
-import { BILLING_OPTIONS } from "@/constants/pricing";
 import { buttonClass } from "@/lib/ui";
-import type { Billing, Plan } from "@/types";
+import type { Billing, BillingOption, Plan } from "@/types";
 import { SignupLink } from "./ui/Signup";
+
+const BILLING_OPTIONS: BillingOption[] = [
+  { value: "monthly", label: "Monthly" },
+  { value: "yearly", label: "Yearly" },
+];
 
 interface PricingPlansProps {
   plans: Plan[];

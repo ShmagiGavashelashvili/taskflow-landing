@@ -9,6 +9,3 @@ export const SITE_DESCRIPTION =
   "TaskFlow is the project management app for small teams. Boards, timelines, chat and automations in one clean workspace. Start your 14-day free trial.";
 
 export const COPYRIGHT_YEAR = 2026;
-
-/** DOM id of the newsletter field. */
-export const NEWSLETTER_INPUT_ID = "newsletter-email";

@@ -1,12 +1,27 @@
 import { ChartColumn, GanttChart, LayoutGrid, MessagesSquare, SquareKanban } from "lucide-react";
-import type {
-  BoardColumn,
-  Kpi,
-  Person,
-  SidebarItem,
-  TimelineRow,
-  VelocityPoint,
-} from "@/types";
+import type { LucideIcon } from "lucide-react";
+import type { Person, Tone } from "@/types";
+
+export interface BoardCard {
+  title: string;
+  tag: string;
+  tagTone: Tone;
+  due: string;
+  people: Person[];
+  progress?: number;
+  done?: boolean;
+}
+
+export interface BoardColumn {
+  name: string;
+  dot: string;
+  cards: BoardCard[];
+}
+
+export interface SidebarItem {
+  icon: LucideIcon;
+  active?: boolean;
+}
 
 const AK: Person = { initials: "AK", tone: 0 };
 const JR: Person = { initials: "JR", tone: 1 };
@@ -51,34 +66,3 @@ export const BOARD_SIDEBAR: SidebarItem[] = [
   { icon: MessagesSquare },
   { icon: ChartColumn },
 ];
-
-export const TIMELINE_DAYS = 14;
-export const TIMELINE_DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S", "M", "T", "W", "T", "F", "S", "S"];
-
-export const TIMELINE_ROWS: TimelineRow[] = [
-  { name: "Research", tone: "rose", start: 1, end: 5, progress: 100 },
-  { name: "Wireframes", tone: "blue", start: 3, end: 8, progress: 85 },
-  { name: "Visual design", tone: "violet", start: 5, end: 11, progress: 55 },
-  { name: "Build", tone: "teal", start: 7, end: 14, progress: 30 },
-  { name: "Content", tone: "amber", start: 8, end: 13, progress: 20 },
-  { name: "Launch", tone: "slate", start: 12, end: 15, progress: 0 },
-];
-
-export const VELOCITY: VelocityPoint[] = [
-  { week: "W1", value: 42 },
-  { week: "W2", value: 55 },
-  { week: "W3", value: 48 },
-  { week: "W4", value: 66 },
-  { week: "W5", value: 72 },
-  { week: "W6", value: 84 },
-];
-
-export const KPIS: Kpi[] = [
-  { label: "Tasks completed", value: "128", delta: "+18%" },
-  { label: "On-time rate", value: "94%", delta: "+6%" },
-  { label: "Avg. cycle time", value: "3.2d", delta: "-0.8d" },
-];
-
-/** SVG polyline points on a 100 × 80 viewBox. */
-export const BURNDOWN_IDEAL = "0,10 100,70";
-export const BURNDOWN_ACTUAL = "0,10 20,22 40,38 60,44 80,58 100,66";

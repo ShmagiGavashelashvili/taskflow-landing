@@ -1,7 +1,7 @@
 import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { COPYRIGHT_YEAR, NEWSLETTER_INPUT_ID } from "@/constants/site";
+import { COPYRIGHT_YEAR } from "@/constants/site";
 import { footerColumns, socialLinks } from "@/data";
 import Footer from "./Footer";
 
@@ -36,7 +36,7 @@ describe("Footer", () => {
     const user = userEvent.setup();
     render(<Footer />);
     const input = screen.getByLabelText("Email for the newsletter");
-    expect(input).toHaveAttribute("id", NEWSLETTER_INPUT_ID);
+    expect(input).toHaveAttribute("id", "newsletter-email");
     await user.click(screen.getByRole("button", { name: /Subscribe/ }));
     expect(screen.getByRole("alert")).toHaveTextContent("Please enter your email address.");
   });

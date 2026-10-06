@@ -2,13 +2,15 @@
 
 import { Menu, X } from "lucide-react";
 import { useCallback, useState } from "react";
-import { NAV_LINK_CLASS } from "@/constants/ui";
 import { navLinks } from "@/data";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useScrolled } from "@/hooks/useScrolled";
 import { buttonClass } from "@/lib/ui";
 import Logo from "./ui/Logo";
 import { SignupLink } from "./ui/Signup";
+
+const NAV_LINK_CLASS =
+  "rounded-lg px-3 py-2 text-sm font-semibold text-muted transition-colors hover:text-ink motion-reduce:transition-none";
 
 export default function Navbar() {
   const scrolled = useScrolled();

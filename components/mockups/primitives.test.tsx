@@ -1,8 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { BADGE_TONE_CLASSES, BAR_TONE_CLASSES } from "@/constants/ui";
 import type { Person, Tone } from "@/types";
-import { AvatarStack, Badge, ProgressBar, TaskCard, WindowFrame } from "./primitives";
+import { AvatarStack, Badge, BAR_TONE_CLASSES, ProgressBar, TaskCard, WindowFrame } from "./primitives";
+
+const BADGE_CLASSES: Record<Tone, string> = {
+  blue: "bg-blue-50 text-blue-700",
+  teal: "bg-teal-50 text-teal-700",
+  amber: "bg-amber-50 text-amber-700",
+  violet: "bg-violet-50 text-violet-700",
+  rose: "bg-rose-50 text-rose-700",
+  slate: "bg-slate-100 text-slate-600",
+};
 
 const people: Person[] = [
   { initials: "AK", tone: 0 },
@@ -29,9 +37,13 @@ describe("WindowFrame", () => {
 });
 
 describe("Badge", () => {
-  it.each(Object.keys(BADGE_TONE_CLASSES) as Tone[])("applies the %s tone", (tone) => {
+  it.each(Object.keys(BADGE_CLASSES) as Tone[])("applies the %s tone", (tone) => {
     render(<Badge tone={tone}>label</Badge>);
-    expect(screen.getByText("label")).toHaveClass(...BADGE_TONE_CLASSES[tone].split(" "));
+    expect(screen.getByText("label")).toHaveClass(...BADGE_CLASSES[tone].split(" "));
+  });
+
+  it("has a bar colour for every badge tone", () => {
+    expect(Object.keys(BAR_TONE_CLASSES).sort()).toEqual(Object.keys(BADGE_CLASSES).sort());
   });
 });
 
@@ -43,9 +55,9 @@ describe("ProgressBar", () => {
 
   it("defaults to blue and supports other tones", () => {
     const { container, rerender } = render(<ProgressBar value={10} />);
-    expect(container.firstElementChild?.firstElementChild).toHaveClass(BAR_TONE_CLASSES.blue);
+    expect(container.firstElementChild?.firstElementChild).toHaveClass("bg-blue-500");
     rerender(<ProgressBar value={10} tone="rose" />);
-    expect(container.firstElementChild?.firstElementChild).toHaveClass(BAR_TONE_CLASSES.rose);
+    expect(container.firstElementChild?.firstElementChild).toHaveClass("bg-rose-400");
   });
 
   it.each([0, 100])("handles the %i%% edge", (value) => {

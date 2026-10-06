@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { BOARD_COLUMNS } from "@/constants/mockups";
+import { BOARD_COLUMNS } from "./board.data";
 import BoardMockup from "./BoardMockup";
 
 describe("BoardMockup", () => {

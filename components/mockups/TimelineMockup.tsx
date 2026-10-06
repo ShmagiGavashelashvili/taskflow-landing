@@ -1,6 +1,5 @@
-import { TIMELINE_DAY_LABELS, TIMELINE_DAYS, TIMELINE_ROWS } from "@/constants/mockups";
-import { BAR_TONE_CLASSES } from "@/constants/ui";
-import { WindowFrame } from "./primitives";
+import { BAR_TONE_CLASSES, WindowFrame } from "./primitives";
+import { TIMELINE_DAY_LABELS, TIMELINE_DAYS, TIMELINE_ROWS } from "./timeline.data";
 
 export default function TimelineMockup({ className = "" }: { className?: string }) {
   return (

@@ -1,6 +1,6 @@
 import { TrendingUp } from "lucide-react";
-import { BURNDOWN_ACTUAL, BURNDOWN_IDEAL, KPIS, VELOCITY } from "@/constants/mockups";
 import { WindowFrame } from "./primitives";
+import { BURNDOWN_ACTUAL, BURNDOWN_IDEAL, KPIS, VELOCITY } from "./reports.data";
 
 export default function ReportsMockup({ className = "" }: { className?: string }) {
   const max = Math.max(...VELOCITY.map((v) => v.value));

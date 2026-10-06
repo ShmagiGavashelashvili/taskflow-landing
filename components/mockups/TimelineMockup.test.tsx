@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { TIMELINE_DAY_LABELS, TIMELINE_DAYS, TIMELINE_ROWS } from "@/constants/mockups";
+import { TIMELINE_DAY_LABELS, TIMELINE_DAYS, TIMELINE_ROWS } from "./timeline.data";
 import TimelineMockup from "./TimelineMockup";
 
 describe("TimelineMockup", () => {

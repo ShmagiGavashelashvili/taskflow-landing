@@ -1,5 +1,5 @@
 import { Bell, CalendarDays, Plus, Search } from "lucide-react";
-import { BOARD_COLUMNS, BOARD_SIDEBAR, BOARD_TEAM } from "@/constants/mockups";
+import { BOARD_COLUMNS, BOARD_SIDEBAR, BOARD_TEAM } from "./board.data";
 import { AvatarStack, TaskCard, WindowFrame } from "./primitives";
 
 export default function BoardMockup({ className = "" }: { className?: string }) {
