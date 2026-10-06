@@ -12,6 +12,7 @@ export default defineConfig({
     css: false,
     coverage: {
       provider: "v8",
+      reporter: ["text", "json-summary"],
       include: ["components/**", "hooks/**", "lib/**", "constants/**", "context/**", "data.ts", "app/**"],
       exclude: ["**/*.test.*", "app/layout.tsx", "app/opengraph-image.tsx", "app/icon.tsx"],
     },

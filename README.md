@@ -1,3 +1,8 @@
+# TaskFlow
+
+[![Test](https://github.com/ShmagiGavashelashvili/taskflow-landing/actions/workflows/test.yml/badge.svg)](https://github.com/ShmagiGavashelashvili/taskflow-landing/actions/workflows/test.yml)
+![Coverage](https://raw.githubusercontent.com/ShmagiGavashelashvili/taskflow-landing/badges/coverage.svg)
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
