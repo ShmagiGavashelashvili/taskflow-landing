@@ -14,6 +14,6 @@ Hooks stay in `hooks/` regardless: they are small, and a second caller is plausi
 
 ## Consequences
 
-- `constants/` holds only site-wide values (`site.ts`).
+- `constants/` holds site-wide values (`site.ts`) and values shared by several modules (`tones.ts`).
 - Tests go through the owning module's interface instead of importing its internals.
 - Architecture reviews should not re-propose moving single-consumer code back into shared folders.

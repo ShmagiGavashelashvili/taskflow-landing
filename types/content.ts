@@ -77,13 +77,6 @@ export interface FooterColumn {
   links: NavLink[];
 }
 
-export type Billing = "monthly" | "yearly";
-
-export interface BillingOption {
-  value: Billing;
-  label: string;
-}
-
 export type BrandIconName = "x" | "github" | "linkedin";
 
 export interface SocialLink {

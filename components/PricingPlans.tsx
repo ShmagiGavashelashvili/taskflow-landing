@@ -4,8 +4,15 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useState } from "react";
 import { buttonClass } from "@/lib/ui";
-import type { Billing, BillingOption, Plan } from "@/types";
+import type { Plan } from "@/types";
 import { SignupLink } from "./ui/Signup";
+
+type Billing = "monthly" | "yearly";
+
+interface BillingOption {
+  value: Billing;
+  label: string;
+}
 
 const BILLING_OPTIONS: BillingOption[] = [
   { value: "monthly", label: "Monthly" },

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Avatar from "@/components/ui/Avatar";
+import { BAR_TONE_CLASSES } from "@/constants/tones";
 import type { Person, Tone } from "@/types";
 
 const BADGE_TONE_CLASSES: Record<Tone, string> = {
@@ -9,15 +10,6 @@ const BADGE_TONE_CLASSES: Record<Tone, string> = {
   violet: "bg-violet-50 text-violet-700",
   rose: "bg-rose-50 text-rose-700",
   slate: "bg-slate-100 text-slate-600",
-};
-
-export const BAR_TONE_CLASSES: Record<Tone, string> = {
-  blue: "bg-blue-500",
-  teal: "bg-teal-500",
-  amber: "bg-amber-400",
-  violet: "bg-violet-500",
-  rose: "bg-rose-400",
-  slate: "bg-slate-400",
 };
 
 interface WindowFrameProps {

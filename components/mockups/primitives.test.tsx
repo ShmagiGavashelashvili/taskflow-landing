@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { Person, Tone } from "@/types";
-import { AvatarStack, Badge, BAR_TONE_CLASSES, ProgressBar, TaskCard, WindowFrame } from "./primitives";
+import { BAR_TONE_CLASSES } from "@/constants/tones";
+import { AvatarStack, Badge, ProgressBar, TaskCard, WindowFrame } from "./primitives";
 
 const BADGE_CLASSES: Record<Tone, string> = {
   blue: "bg-blue-50 text-blue-700",
