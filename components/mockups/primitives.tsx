@@ -1,30 +1,7 @@
 import type { ReactNode } from "react";
 import Avatar from "@/components/ui/Avatar";
-
-export type Tone = "blue" | "teal" | "amber" | "violet" | "rose" | "slate";
-
-const badgeTone: Record<Tone, string> = {
-  blue: "bg-blue-50 text-blue-700",
-  teal: "bg-teal-50 text-teal-700",
-  amber: "bg-amber-50 text-amber-700",
-  violet: "bg-violet-50 text-violet-700",
-  rose: "bg-rose-50 text-rose-700",
-  slate: "bg-slate-100 text-slate-600",
-};
-
-export const barTone: Record<Tone, string> = {
-  blue: "bg-blue-500",
-  teal: "bg-teal-500",
-  amber: "bg-amber-400",
-  violet: "bg-violet-500",
-  rose: "bg-rose-400",
-  slate: "bg-slate-400",
-};
-
-export interface Person {
-  initials: string;
-  tone: number;
-}
+import { BADGE_TONE_CLASSES, BAR_TONE_CLASSES } from "@/constants/ui";
+import type { Person, Tone } from "@/types";
 
 interface WindowFrameProps {
   children: ReactNode;
@@ -57,7 +34,7 @@ export function WindowFrame({ children, url = "app.taskflow.demo", className = "
 
 export function Badge({ tone, children }: { tone: Tone; children: ReactNode }) {
   return (
-    <span className={`inline-block rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${badgeTone[tone]}`}>
+    <span className={`inline-block rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${BADGE_TONE_CLASSES[tone]}`}>
       {children}
     </span>
   );
@@ -66,7 +43,7 @@ export function Badge({ tone, children }: { tone: Tone; children: ReactNode }) {
 export function ProgressBar({ value, tone = "blue" }: { value: number; tone?: Tone }) {
   return (
     <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-      <div className={`h-full rounded-full ${barTone[tone]}`} style={{ width: `${value}%` }} />
+      <div className={`h-full rounded-full ${BAR_TONE_CLASSES[tone]}`} style={{ width: `${value}%` }} />
     </div>
   );
 }

@@ -1,65 +1,6 @@
-import { Bell, CalendarDays, ChartColumn, GanttChart, LayoutGrid, MessagesSquare, Plus, Search, SquareKanban } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Bell, CalendarDays, Plus, Search } from "lucide-react";
+import { BOARD_COLUMNS, BOARD_SIDEBAR, BOARD_TEAM } from "@/constants/mockups";
 import { AvatarStack, TaskCard, WindowFrame } from "./primitives";
-import type { Person, Tone } from "./primitives";
-
-interface Card {
-  title: string;
-  tag: string;
-  tagTone: Tone;
-  due: string;
-  people: Person[];
-  progress?: number;
-  done?: boolean;
-}
-
-interface Column {
-  name: string;
-  dot: string;
-  cards: Card[];
-}
-
-const AK: Person = { initials: "AK", tone: 0 };
-const JR: Person = { initials: "JR", tone: 1 };
-const MS: Person = { initials: "MS", tone: 2 };
-const LP: Person = { initials: "LP", tone: 3 };
-
-const columns: Column[] = [
-  {
-    name: "To do",
-    dot: "bg-slate-400",
-    cards: [
-      { title: "Draft Q4 launch plan", tag: "Planning", tagTone: "blue", due: "Oct 14", people: [AK, MS] },
-      { title: "Review pricing page copy", tag: "Marketing", tagTone: "amber", due: "Oct 16", people: [LP] },
-      { title: "Prepare partner webinar", tag: "Marketing", tagTone: "amber", due: "Oct 21", people: [JR] },
-    ],
-  },
-  {
-    name: "In progress",
-    dot: "bg-blue-500",
-    cards: [
-      { title: "Redesign onboarding flow", tag: "Design", tagTone: "violet", due: "Oct 11", people: [MS, LP], progress: 65 },
-      { title: "API rate limit docs", tag: "Engineering", tagTone: "teal", due: "Oct 12", people: [JR], progress: 40 },
-      { title: "Customer interview synthesis", tag: "Research", tagTone: "rose", due: "Oct 13", people: [AK], progress: 80 },
-    ],
-  },
-  {
-    name: "Done",
-    dot: "bg-emerald-500",
-    cards: [
-      { title: "Set up product analytics", tag: "Engineering", tagTone: "teal", due: "Oct 4", people: [JR], done: true },
-      { title: "Kickoff with design partners", tag: "Planning", tagTone: "blue", due: "Oct 2", people: [AK, LP], done: true },
-    ],
-  },
-];
-
-const sidebar: { icon: LucideIcon; active?: boolean }[] = [
-  { icon: LayoutGrid },
-  { icon: SquareKanban, active: true },
-  { icon: GanttChart },
-  { icon: MessagesSquare },
-  { icon: ChartColumn },
-];
 
 export default function BoardMockup({ className = "" }: { className?: string }) {
   return (
@@ -67,7 +8,7 @@ export default function BoardMockup({ className = "" }: { className?: string }) 
       <div className="flex">
         <div className="hidden w-14 shrink-0 flex-col items-center gap-2 border-r border-line bg-[#fbfaf7] py-4 sm:flex">
           <span className="mb-2 h-7 w-7 rounded-lg bg-gradient-to-br from-brand to-[#0fa89c]" />
-          {sidebar.map(({ icon: Icon, active }, i) => (
+          {BOARD_SIDEBAR.map(({ icon: Icon, active }, i) => (
             <span
               key={i}
               className={`flex h-9 w-9 items-center justify-center rounded-lg ${active ? "bg-tint text-brand" : "text-muted"}`}
@@ -89,14 +30,14 @@ export default function BoardMockup({ className = "" }: { className?: string }) 
                 <Search className="h-3 w-3" /> Search
               </span>
               <Bell className="hidden h-4 w-4 text-muted sm:block" />
-              <AvatarStack people={[AK, JR, MS, LP]} />
+              <AvatarStack people={BOARD_TEAM} />
               <span className="flex h-7 items-center gap-1 rounded-lg bg-brand px-2.5 text-[10px] font-semibold text-white">
                 <Plus className="h-3 w-3" /> Task
               </span>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-            {columns.map((column, index) => (
+            {BOARD_COLUMNS.map((column, index) => (
               <div key={column.name} className={index === 2 ? "hidden lg:block" : ""}>
                 <div className="mb-2.5 flex items-center gap-2 px-1">
                   <span className={`h-2 w-2 rounded-full ${column.dot}`} />

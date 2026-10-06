@@ -1,8 +1,8 @@
+import { SIGNUP_INPUT_ID } from "@/constants/site";
 import BoardMockup from "./mockups/BoardMockup";
 import EmailCapture from "./ui/EmailCapture";
 import Float from "./ui/Float";
 import Reveal from "./ui/Reveal";
-import { SIGNUP_INPUT_ID } from "./ui/SignupLink";
 
 export default function Hero() {
   return (

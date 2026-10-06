@@ -2,11 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { SIMULATED_LATENCY_MS } from "@/constants/forms";
 import { validateEmail } from "@/lib/validateEmail";
 
 export type EmailFormStatus = "idle" | "submitting" | "success";
-
-const SIMULATED_LATENCY_MS = 800;
 
 export interface EmailForm {
   email: string;

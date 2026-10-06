@@ -3,11 +3,10 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useState } from "react";
+import { BILLING_OPTIONS } from "@/constants/pricing";
 import { buttonClass } from "@/lib/ui";
-import type { Plan } from "@/types";
+import type { Billing, Plan } from "@/types";
 import SignupLink from "./ui/SignupLink";
-
-type Billing = "monthly" | "yearly";
 
 interface PricingPlansProps {
   plans: Plan[];
@@ -37,17 +36,12 @@ function AnimatedPrice({ amount }: { amount: number }) {
 export default function PricingPlans({ plans, yearlySavings }: PricingPlansProps) {
   const [billing, setBilling] = useState<Billing>("monthly");
 
-  const options: { value: Billing; label: string }[] = [
-    { value: "monthly", label: "Monthly" },
-    { value: "yearly", label: "Yearly" },
-  ];
-
   return (
     <div>
       <fieldset className="mx-auto mb-12 flex w-fit items-center gap-3">
         <legend className="sr-only">Billing period</legend>
         <div className="flex gap-1 rounded-2xl border border-line bg-white p-1.5 shadow-card">
-          {options.map((option) => (
+          {BILLING_OPTIONS.map((option) => (
             <label key={option.value} className="relative cursor-pointer">
               <input
                 type="radio"

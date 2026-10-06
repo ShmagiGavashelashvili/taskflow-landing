@@ -1,19 +1,5 @@
-const gradients = [
-  "from-blue-500 to-cyan-400",
-  "from-teal-500 to-emerald-400",
-  "from-amber-400 to-orange-500",
-  "from-violet-500 to-fuchsia-400",
-  "from-rose-500 to-pink-400",
-] as const;
-
-type AvatarSize = "sm" | "md" | "lg" | "xl";
-
-const sizes: Record<AvatarSize, string> = {
-  sm: "h-5 w-5 text-[8px]",
-  md: "h-6 w-6 text-[9px]",
-  lg: "h-8 w-8 text-[11px]",
-  xl: "h-12 w-12 text-sm",
-};
+import { AVATAR_GRADIENTS, AVATAR_SIZE_CLASSES } from "@/constants/ui";
+import type { AvatarSize } from "@/types";
 
 interface AvatarProps {
   initials: string;
@@ -24,11 +10,11 @@ interface AvatarProps {
 
 /** Initials on a gradient circle. Decorative: the person's name is always shown next to it. */
 export default function Avatar({ initials, tone = 0, size = "md", className = "" }: AvatarProps) {
-  const gradient = gradients[tone % gradients.length];
+  const gradient = AVATAR_GRADIENTS[tone % AVATAR_GRADIENTS.length];
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br font-bold text-white ring-2 ring-white ${gradient} ${sizes[size]} ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br font-bold text-white ring-2 ring-white ${gradient} ${AVATAR_SIZE_CLASSES[size]} ${className}`}
     >
       {initials}
     </span>

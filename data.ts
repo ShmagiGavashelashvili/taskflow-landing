@@ -9,6 +9,7 @@ import {
   UserPlus,
   Zap,
 } from "lucide-react";
+import { GithubIcon, LinkedinIcon, XIcon } from "@/components/icons/BrandIcons";
 import type {
   Company,
   FaqItem,
@@ -18,6 +19,7 @@ import type {
   Plan,
   ShowcaseTab,
   Stat,
+  SocialLink,
   Step,
   Testimonial,
 } from "./types";
@@ -292,4 +294,10 @@ export const footerColumns: FooterColumn[] = [
       { label: "Security", href: "#" },
     ],
   },
+];
+
+export const socialLinks: SocialLink[] = [
+  { label: "TaskFlow on X", href: "#", Icon: XIcon },
+  { label: "TaskFlow on GitHub", href: "#", Icon: GithubIcon },
+  { label: "TaskFlow on LinkedIn", href: "#", Icon: LinkedinIcon },
 ];

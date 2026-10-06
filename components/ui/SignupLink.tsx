@@ -1,8 +1,7 @@
 "use client";
 
 import type { MouseEvent, ReactNode } from "react";
-
-export const SIGNUP_INPUT_ID = "hero-email";
+import { SIGNUP_INPUT_ID } from "@/constants/site";
 
 interface SignupLinkProps {
   children: ReactNode;

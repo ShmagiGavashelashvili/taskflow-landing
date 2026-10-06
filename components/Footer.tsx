@@ -1,15 +1,7 @@
-import { footerColumns } from "@/data";
-import { GithubIcon, LinkedinIcon, XIcon } from "./icons/BrandIcons";
+import { COPYRIGHT_YEAR, NEWSLETTER_INPUT_ID } from "@/constants/site";
+import { footerColumns, socialLinks } from "@/data";
 import EmailCapture from "./ui/EmailCapture";
 import Logo from "./ui/Logo";
-
-const COPYRIGHT_YEAR = 2026;
-
-const socials = [
-  { label: "TaskFlow on X", href: "#", Icon: XIcon },
-  { label: "TaskFlow on GitHub", href: "#", Icon: GithubIcon },
-  { label: "TaskFlow on LinkedIn", href: "#", Icon: LinkedinIcon },
-];
 
 export default function Footer() {
   return (
@@ -22,7 +14,7 @@ export default function Footer() {
               The calm, clear way for small teams to plan, track and ship their work.
             </p>
             <div className="mt-6 flex gap-2">
-              {socials.map(({ label, href, Icon }) => (
+              {socialLinks.map(({ label, href, Icon }) => (
                 <a
                   key={label}
                   href={href}
@@ -62,7 +54,7 @@ export default function Footer() {
               <p className="mt-1 text-sm text-white/70">One short email a month. No spam, unsubscribe anytime.</p>
             </div>
             <EmailCapture
-              inputId="newsletter-email"
+              inputId={NEWSLETTER_INPUT_ID}
               label="Email for the newsletter"
               buttonLabel="Subscribe"
               successTitle="Thanks for subscribing!"

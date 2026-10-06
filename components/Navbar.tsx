@@ -2,6 +2,7 @@
 
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { NAV_LINK_CLASS } from "@/constants/ui";
 import { navLinks } from "@/data";
 import { buttonClass } from "@/lib/ui";
 import Logo from "./ui/Logo";
@@ -27,9 +28,6 @@ export default function Navbar() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
-  const linkClass =
-    "rounded-lg px-3 py-2 text-sm font-semibold text-muted transition-colors hover:text-ink motion-reduce:transition-none";
-
   return (
     <header
       className={`sticky top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-300 motion-reduce:transition-none ${
@@ -46,7 +44,7 @@ export default function Navbar() {
         <ul className="hidden items-center gap-1 md:flex">
           {navLinks.map((link) => (
             <li key={link.href}>
-              <a href={link.href} className={linkClass}>
+              <a href={link.href} className={NAV_LINK_CLASS}>
                 {link.label}
               </a>
             </li>
@@ -54,7 +52,7 @@ export default function Navbar() {
         </ul>
 
         <div className="hidden items-center gap-2 md:flex">
-          <a href="#" className={`${linkClass} text-ink`}>
+          <a href="#" className={`${NAV_LINK_CLASS} text-ink`}>
             Log in
           </a>
           <SignupLink className={buttonClass("primary", "md")}>Start Free Trial</SignupLink>
