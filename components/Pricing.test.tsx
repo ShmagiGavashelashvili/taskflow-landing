@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { YEARLY_SAVINGS_PERCENT } from "@/constants/pricing";
 import Pricing from "./Pricing";
 
 describe("Pricing", () => {
@@ -10,9 +9,9 @@ describe("Pricing", () => {
     expect(screen.getByRole("heading", { level: 2, name: /Simple pricing/ })).toBeInTheDocument();
   });
 
-  it("passes the configured yearly savings to the toggle", () => {
+  it("shows the yearly savings next to the toggle", () => {
     render(<Pricing />);
-    expect(screen.getByText(`Save ${YEARLY_SAVINGS_PERCENT}%`)).toBeInTheDocument();
+    expect(screen.getByText("Save 20%")).toBeInTheDocument();
   });
 
   it("renders all three plans", () => {

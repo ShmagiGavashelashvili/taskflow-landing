@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { plans } from "@/data";
 import PricingPlans from "./PricingPlans";
 
-const renderPlans = () => render(<PricingPlans plans={plans} yearlySavings={20} />);
+const renderPlans = () => render(<PricingPlans plans={plans} />);
 const card = (name: string) => screen.getByRole("heading", { level: 3, name }).closest("li") as HTMLElement;
 const priceOf = (name: string) => card(name).querySelector(".tabular-nums")?.textContent;
 
@@ -90,8 +90,19 @@ describe("PricingPlans", () => {
     expect(within(card("Business")).getByRole("link", { name: "Contact sales" })).toBeInTheDocument();
   });
 
-  it("shows the savings percentage it is given", () => {
-    render(<PricingPlans plans={plans} yearlySavings={35} />);
+  it("derives the savings percentage from the plan prices", () => {
+    render(<PricingPlans plans={plans.map((p) => ({ ...p, yearly: p.monthly * 0.65 }))} />);
     expect(screen.getByText("Save 35%")).toBeInTheDocument();
+  });
+
+  it("shows the largest saving when paid plans differ", () => {
+    const [free, pro, business] = plans;
+    render(<PricingPlans plans={[free, { ...pro, yearly: pro.monthly * 0.9 }, { ...business, yearly: business.monthly * 0.75 }]} />);
+    expect(screen.getByText("Save 25%")).toBeInTheDocument();
+  });
+
+  it("hides the savings badge when no plan is cheaper yearly", () => {
+    render(<PricingPlans plans={[plans[0]]} />);
+    expect(screen.queryByText(/^Save/)).not.toBeInTheDocument();
   });
 });

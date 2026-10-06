@@ -10,8 +10,12 @@ import SignupLink from "./ui/SignupLink";
 
 interface PricingPlansProps {
   plans: Plan[];
-  /** Percentage saved by paying yearly, shown next to the toggle. */
-  yearlySavings: number;
+}
+
+/** Largest percentage saved by paying yearly, derived from the paid plans' prices. */
+function yearlySavingsPercent(plans: Plan[]): number {
+  const savings = plans.filter((plan) => plan.monthly > 0).map((plan) => 1 - plan.yearly / plan.monthly);
+  return Math.round(Math.max(0, ...savings) * 100);
 }
 
 function AnimatedPrice({ amount }: { amount: number }) {
@@ -33,8 +37,9 @@ function AnimatedPrice({ amount }: { amount: number }) {
   );
 }
 
-export default function PricingPlans({ plans, yearlySavings }: PricingPlansProps) {
+export default function PricingPlans({ plans }: PricingPlansProps) {
   const [billing, setBilling] = useState<Billing>("monthly");
+  const yearlySavings = yearlySavingsPercent(plans);
 
   return (
     <div>
@@ -57,9 +62,11 @@ export default function PricingPlans({ plans, yearlySavings }: PricingPlansProps
             </label>
           ))}
         </div>
-        <span className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-bold text-emerald-800">
-          Save {yearlySavings}%
-        </span>
+        {yearlySavings > 0 ? (
+          <span className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-bold text-emerald-800">
+            Save {yearlySavings}%
+          </span>
+        ) : null}
       </fieldset>
 
       <ul className="mx-auto grid max-w-md gap-6 lg:max-w-none lg:grid-cols-3 lg:items-stretch">

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EMAIL_PATTERN, SIMULATED_LATENCY_MS } from "./forms";
 import { BOARD_COLUMNS, TIMELINE_DAYS, TIMELINE_ROWS, VELOCITY } from "./mockups";
-import { BILLING_OPTIONS, YEARLY_SAVINGS_PERCENT } from "./pricing";
+import { BILLING_OPTIONS } from "./pricing";
 import { NEWSLETTER_INPUT_ID, SIGNUP_INPUT_ID } from "./site";
 import { AVATAR_GRADIENTS, AVATAR_SIZE_CLASSES, BADGE_TONE_CLASSES, BAR_TONE_CLASSES } from "./ui";
 
@@ -12,7 +12,6 @@ describe("constants", () => {
 
   it("offers monthly then yearly billing", () => {
     expect(BILLING_OPTIONS.map((o) => o.value)).toEqual(["monthly", "yearly"]);
-    expect(YEARLY_SAVINGS_PERCENT).toBe(20);
   });
 
   it("has a positive simulated latency and a usable email pattern", () => {

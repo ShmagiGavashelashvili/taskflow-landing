@@ -1,4 +1,3 @@
-import { YEARLY_SAVINGS_PERCENT } from "@/constants/pricing";
 import { plans } from "@/data";
 import PricingPlans from "./PricingPlans";
 import Reveal from "./ui/Reveal";
@@ -14,7 +13,7 @@ export default function Pricing() {
         description="Start free, upgrade when you're ready. Every paid plan includes a 14-day trial."
       />
       <Reveal>
-        <PricingPlans plans={plans} yearlySavings={YEARLY_SAVINGS_PERCENT} />
+        <PricingPlans plans={plans} />
       </Reveal>
     </Section>
   );
