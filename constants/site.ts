@@ -10,6 +10,5 @@ export const SITE_DESCRIPTION =
 
 export const COPYRIGHT_YEAR = 2026;
 
-/** DOM ids that other links and sections point at. */
-export const SIGNUP_INPUT_ID = "hero-email";
+/** DOM id of the newsletter field. */
 export const NEWSLETTER_INPUT_ID = "newsletter-email";

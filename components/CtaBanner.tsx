@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { buttonClass } from "@/lib/ui";
 import Reveal from "./ui/Reveal";
-import SignupLink from "./ui/SignupLink";
+import { SignupLink } from "./ui/Signup";
 
 export default function CtaBanner() {
   return (

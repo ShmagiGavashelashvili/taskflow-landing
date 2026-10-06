@@ -1,8 +1,7 @@
-import { SIGNUP_INPUT_ID } from "@/constants/site";
 import BoardMockup from "./mockups/BoardMockup";
-import EmailCapture from "./ui/EmailCapture";
 import Float from "./ui/Float";
 import Reveal from "./ui/Reveal";
+import { SignupField } from "./ui/Signup";
 
 export default function Hero() {
   return (
@@ -38,16 +37,9 @@ export default function Hero() {
             </p>
           </Reveal>
           <Reveal delay={0.15}>
-            <div id="get-started" className="mx-auto mt-9 max-w-lg">
-              <EmailCapture
-                inputId={SIGNUP_INPUT_ID}
-                label="Work email"
-                buttonLabel="Get Started Free"
-                successTitle="You're on the list!"
-                successMessage="This is a demo, so nothing was sent. In a real app we'd email you a sign-in link."
-              />
+            <SignupField className="mx-auto mt-9 max-w-lg">
               <p className="mt-3 text-sm text-muted">No credit card required · 14-day free trial</p>
-            </div>
+            </SignupField>
           </Reveal>
         </div>
 

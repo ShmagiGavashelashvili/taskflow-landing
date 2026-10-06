@@ -2,14 +2,9 @@ import { describe, expect, it } from "vitest";
 import { EMAIL_PATTERN, SIMULATED_LATENCY_MS } from "./forms";
 import { BOARD_COLUMNS, TIMELINE_DAYS, TIMELINE_ROWS, VELOCITY } from "./mockups";
 import { BILLING_OPTIONS } from "./pricing";
-import { NEWSLETTER_INPUT_ID, SIGNUP_INPUT_ID } from "./site";
 import { AVATAR_GRADIENTS, AVATAR_SIZE_CLASSES, BADGE_TONE_CLASSES, BAR_TONE_CLASSES } from "./ui";
 
 describe("constants", () => {
-  it("uses distinct input ids for the two forms", () => {
-    expect(SIGNUP_INPUT_ID).not.toBe(NEWSLETTER_INPUT_ID);
-  });
-
   it("offers monthly then yearly billing", () => {
     expect(BILLING_OPTIONS.map((o) => o.value)).toEqual(["monthly", "yearly"]);
   });

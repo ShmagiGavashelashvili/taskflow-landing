@@ -8,7 +8,7 @@ import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useScrolled } from "@/hooks/useScrolled";
 import { buttonClass } from "@/lib/ui";
 import Logo from "./ui/Logo";
-import SignupLink from "./ui/SignupLink";
+import { SignupLink } from "./ui/Signup";
 
 export default function Navbar() {
   const scrolled = useScrolled();

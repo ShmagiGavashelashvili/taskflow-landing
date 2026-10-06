@@ -1,9 +1,9 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { SIGNUP_INPUT_ID } from "@/constants/site";
 import { navLinks } from "@/data";
 import Navbar from "./Navbar";
+import { SignupField } from "./ui/Signup";
 
 function scrollTo(y: number) {
   Object.defineProperty(window, "scrollY", { value: y, configurable: true, writable: true });
@@ -77,7 +77,7 @@ describe("Navbar", () => {
       const user = userEvent.setup();
       render(
         <>
-          <input id={SIGNUP_INPUT_ID} aria-label="email" />
+          <SignupField />
           <Navbar />
         </>,
       );
@@ -85,7 +85,7 @@ describe("Navbar", () => {
       const menu = document.getElementById("mobile-menu") as HTMLElement;
       fireEvent.click(within(menu).getByRole("link", { name: "Start Free Trial" }));
       expect(document.getElementById("mobile-menu")).toBeNull();
-      expect(screen.getByLabelText("email")).toHaveFocus();
+      expect(screen.getByLabelText("Work email")).toHaveFocus();
     });
   });
 });

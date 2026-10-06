@@ -6,7 +6,7 @@ import { useState } from "react";
 import { BILLING_OPTIONS } from "@/constants/pricing";
 import { buttonClass } from "@/lib/ui";
 import type { Billing, Plan } from "@/types";
-import SignupLink from "./ui/SignupLink";
+import { SignupLink } from "./ui/Signup";
 
 interface PricingPlansProps {
   plans: Plan[];

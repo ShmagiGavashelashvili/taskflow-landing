@@ -1,7 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SIGNUP_INPUT_ID } from "@/constants/site";
 import { SIMULATED_LATENCY_MS } from "@/constants/forms";
 import Hero from "./Hero";
 
@@ -26,7 +25,7 @@ describe("Hero", () => {
   it("has the focusable email field used by every 'Start Free Trial' link", () => {
     render(<Hero />);
     const input = screen.getByLabelText("Work email");
-    expect(input).toHaveAttribute("id", SIGNUP_INPUT_ID);
+    expect(input).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Get Started Free/ })).toBeInTheDocument();
   });
 
