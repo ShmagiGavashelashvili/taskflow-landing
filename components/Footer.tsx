@@ -1,5 +1,6 @@
 import { COPYRIGHT_YEAR, NEWSLETTER_INPUT_ID } from "@/constants/site";
 import { footerColumns, socialLinks } from "@/data";
+import { BRAND_ICONS } from "./icons/BrandIcons";
 import EmailCapture from "./ui/EmailCapture";
 import Logo from "./ui/Logo";
 
@@ -14,16 +15,19 @@ export default function Footer() {
               The calm, clear way for small teams to plan, track and ship their work.
             </p>
             <div className="mt-6 flex gap-2">
-              {socialLinks.map(({ label, href, Icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white/80 transition-colors hover:bg-white/20 hover:text-white focus-visible:outline-white motion-reduce:transition-none"
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
+              {socialLinks.map(({ label, href, icon }) => {
+                const Icon = BRAND_ICONS[icon];
+                return (
+                  <a
+                    key={label}
+                    href={href}
+                    aria-label={label}
+                    className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white/80 transition-colors hover:bg-white/20 hover:text-white focus-visible:outline-white motion-reduce:transition-none"
+                  >
+                    <Icon className="h-4 w-4" />
+                  </a>
+                );
+              })}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">

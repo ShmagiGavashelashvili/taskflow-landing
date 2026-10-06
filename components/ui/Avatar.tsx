@@ -1,16 +1,16 @@
 import { AVATAR_GRADIENTS, AVATAR_SIZE_CLASSES } from "@/constants/ui";
-import type { AvatarSize } from "@/types";
+import type { AvatarSize, AvatarTone } from "@/types";
 
 interface AvatarProps {
   initials: string;
-  tone?: number;
+  tone?: AvatarTone;
   size?: AvatarSize;
   className?: string;
 }
 
 /** Initials on a gradient circle. Decorative: the person's name is always shown next to it. */
 export default function Avatar({ initials, tone = 0, size = "md", className = "" }: AvatarProps) {
-  const gradient = AVATAR_GRADIENTS[tone % AVATAR_GRADIENTS.length];
+  const gradient = AVATAR_GRADIENTS[tone];
   return (
     <span
       aria-hidden="true"

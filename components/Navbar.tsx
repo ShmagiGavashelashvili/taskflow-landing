@@ -1,32 +1,21 @@
 "use client";
 
 import { Menu, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { NAV_LINK_CLASS } from "@/constants/ui";
 import { navLinks } from "@/data";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrolled } from "@/hooks/useScrolled";
 import { buttonClass } from "@/lib/ui";
 import Logo from "./ui/Logo";
 import SignupLink from "./ui/SignupLink";
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+  const scrolled = useScrolled();
   const [open, setOpen] = useState(false);
+  const closeMenu = useCallback(() => setOpen(false), []);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open]);
+  useEscapeKey(open, closeMenu);
 
   return (
     <header

@@ -1,4 +1,5 @@
-import type { SVGProps } from "react";
+import type { ComponentType, SVGProps } from "react";
+import type { BrandIconName } from "@/types";
 
 type IconProps = SVGProps<SVGSVGElement>;
 
@@ -36,3 +37,9 @@ export function LinkedinIcon(props: IconProps) {
     />
   );
 }
+
+export const BRAND_ICONS: Record<BrandIconName, ComponentType<IconProps>> = {
+  x: XIcon,
+  github: GithubIcon,
+  linkedin: LinkedinIcon,
+};
