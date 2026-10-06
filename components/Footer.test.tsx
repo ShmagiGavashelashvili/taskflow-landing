@@ -1,7 +1,6 @@
 import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SIMULATED_LATENCY_MS } from "@/constants/forms";
 import { COPYRIGHT_YEAR, NEWSLETTER_INPUT_ID } from "@/constants/site";
 import { footerColumns, socialLinks } from "@/data";
 import Footer from "./Footer";
@@ -48,7 +47,7 @@ describe("Footer", () => {
     render(<Footer />);
     await user.type(screen.getByLabelText("Email for the newsletter"), "jane@example.com");
     await user.click(screen.getByRole("button", { name: /Subscribe/ }));
-    act(() => vi.advanceTimersByTime(SIMULATED_LATENCY_MS));
+    act(() => vi.advanceTimersByTime(800));
     expect(screen.getByRole("status")).toHaveTextContent("Thanks for subscribing!");
   });
 });

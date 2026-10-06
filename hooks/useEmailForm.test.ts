@@ -1,9 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
 import type { ChangeEvent, FormEvent } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { SIMULATED_LATENCY_MS } from "@/constants/forms";
 import { useEmailForm } from "./useEmailForm";
 
+const SIMULATED_LATENCY_MS = 800;
 const changeEvent = (value: string) => ({ target: { value } }) as ChangeEvent<HTMLInputElement>;
 const submitEvent = () => ({ preventDefault: vi.fn() }) as unknown as FormEvent<HTMLFormElement>;
 
@@ -43,6 +43,35 @@ describe("useEmailForm", () => {
     expect(result.current.error).toBe("That doesn't look like a valid email address.");
     expect(result.current.status).toBe("idle");
   });
+
+  it.each(["jane@example.com", "a.b+tag@sub.domain.io", "x@y.co", "  jane@example.com  "])(
+    "accepts %j",
+    (value) => {
+      const { result } = renderHook(() => useEmailForm());
+      act(() => result.current.onChange(changeEvent(value)));
+      act(() => result.current.onSubmit(submitEvent()));
+      expect(result.current.error).toBeNull();
+      expect(result.current.status).toBe("submitting");
+    },
+  );
+
+  it.each(["   "])("asks for an address when the value is blank (%j)", (value) => {
+    const { result } = renderHook(() => useEmailForm());
+    act(() => result.current.onChange(changeEvent(value)));
+    act(() => result.current.onSubmit(submitEvent()));
+    expect(result.current.error).toBe("Please enter your email address.");
+  });
+
+  it.each(["plain", "no-at.example.com", "@example.com", "jane@", "jane@example", "jane@example.c", "ja ne@example.com", "a@b@c.com"])(
+    "rejects %j as invalid",
+    (value) => {
+      const { result } = renderHook(() => useEmailForm());
+      act(() => result.current.onChange(changeEvent(value)));
+      act(() => result.current.onSubmit(submitEvent()));
+      expect(result.current.error).toBe("That doesn't look like a valid email address.");
+      expect(result.current.status).toBe("idle");
+    },
+  );
 
   it("clears the error as soon as the user edits the field", () => {
     const { result } = renderHook(() => useEmailForm());

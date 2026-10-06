@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { EMAIL_PATTERN, SIMULATED_LATENCY_MS } from "./forms";
 import { BOARD_COLUMNS, TIMELINE_DAYS, TIMELINE_ROWS, VELOCITY } from "./mockups";
 import { BILLING_OPTIONS } from "./pricing";
 import { AVATAR_GRADIENTS, AVATAR_SIZE_CLASSES, BADGE_TONE_CLASSES, BAR_TONE_CLASSES } from "./ui";
@@ -7,12 +6,6 @@ import { AVATAR_GRADIENTS, AVATAR_SIZE_CLASSES, BADGE_TONE_CLASSES, BAR_TONE_CLA
 describe("constants", () => {
   it("offers monthly then yearly billing", () => {
     expect(BILLING_OPTIONS.map((o) => o.value)).toEqual(["monthly", "yearly"]);
-  });
-
-  it("has a positive simulated latency and a usable email pattern", () => {
-    expect(SIMULATED_LATENCY_MS).toBeGreaterThan(0);
-    expect(EMAIL_PATTERN.test("a@b.co")).toBe(true);
-    expect(EMAIL_PATTERN.test("nope")).toBe(false);
   });
 
   it("has a class for every avatar gradient slot, size and tone", () => {

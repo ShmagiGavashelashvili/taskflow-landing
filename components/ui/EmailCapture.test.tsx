@@ -1,7 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SIMULATED_LATENCY_MS } from "@/constants/forms";
 import EmailCapture from "./EmailCapture";
 
 const props = {
@@ -66,7 +65,7 @@ describe("EmailCapture", () => {
     await user.click(screen.getByRole("button", { name: /Get Started Free/ }));
     const sending = screen.getByRole("button", { name: /Sending/ });
     expect(sending).toBeDisabled();
-    act(() => vi.advanceTimersByTime(SIMULATED_LATENCY_MS));
+    act(() => vi.advanceTimersByTime(800));
     const status = screen.getByRole("status");
     expect(status).toHaveTextContent("You're on the list!");
     expect(status).toHaveTextContent("Demo only.");
@@ -77,7 +76,7 @@ describe("EmailCapture", () => {
     const user = setup();
     await user.type(screen.getByLabelText("Work email"), "jane@example.com");
     await user.click(screen.getByRole("button", { name: /Get Started Free/ }));
-    act(() => vi.advanceTimersByTime(SIMULATED_LATENCY_MS));
+    act(() => vi.advanceTimersByTime(800));
     await user.click(screen.getByRole("button", { name: "Use a different email" }));
     expect(screen.getByLabelText("Work email")).toHaveValue("");
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
@@ -88,7 +87,7 @@ describe("EmailCapture", () => {
     expect(screen.getByLabelText("Work email")).toHaveClass("text-white");
     await user.type(screen.getByLabelText("Work email"), "jane@example.com");
     await user.click(screen.getByRole("button", { name: /Get Started Free/ }));
-    act(() => vi.advanceTimersByTime(SIMULATED_LATENCY_MS));
+    act(() => vi.advanceTimersByTime(800));
     expect(screen.getByRole("status")).toHaveClass("text-white");
   });
 });

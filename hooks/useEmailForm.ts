@@ -2,8 +2,18 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { SIMULATED_LATENCY_MS } from "@/constants/forms";
-import { validateEmail } from "@/lib/validateEmail";
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+/** The demo forms don't send anything, so this fakes a network round trip. */
+const SIMULATED_LATENCY_MS = 800;
+
+function validateEmail(value: string): string | null {
+  const email = value.trim();
+  if (email === "") return "Please enter your email address.";
+  if (!EMAIL_PATTERN.test(email)) return "That doesn't look like a valid email address.";
+  return null;
+}
 
 export type EmailFormStatus = "idle" | "submitting" | "success";
 

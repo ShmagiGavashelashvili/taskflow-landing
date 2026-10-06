@@ -1,7 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SIMULATED_LATENCY_MS } from "@/constants/forms";
 import Hero from "./Hero";
 
 describe("Hero", () => {
@@ -44,7 +43,7 @@ describe("Hero", () => {
     expect(screen.getByRole("alert")).toBeInTheDocument();
     await user.type(screen.getByLabelText("Work email"), "jane@example.com");
     await user.click(screen.getByRole("button", { name: /Get Started Free/ }));
-    act(() => vi.advanceTimersByTime(SIMULATED_LATENCY_MS));
+    act(() => vi.advanceTimersByTime(800));
     expect(screen.getByRole("status")).toHaveTextContent("You're on the list!");
   });
 });
