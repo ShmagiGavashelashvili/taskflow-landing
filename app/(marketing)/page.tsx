@@ -9,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import Pricing from "@/components/Pricing";
 import ProductShowcase from "@/components/ProductShowcase";
 import Testimonials from "@/components/Testimonials";
+import NavbarAccount from "./NavbarAccount";
 
 export default function Home() {
   return (
@@ -19,7 +20,7 @@ export default function Home() {
       >
         Skip to content
       </a>
-      <Navbar />
+      <Navbar account={<NavbarAccount />} />
       <main id="main">
         <Hero />
         <LogoStrip />

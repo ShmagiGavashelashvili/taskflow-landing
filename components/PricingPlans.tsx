@@ -2,10 +2,11 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Check } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
+import { registerUrl } from "@/lib/auth/paths";
 import { buttonClass } from "@/lib/ui";
 import type { Plan } from "@/types";
-import { SignupLink } from "./ui/Signup";
 
 type Billing = "monthly" | "yearly";
 
@@ -106,11 +107,12 @@ export default function PricingPlans({ plans }: PricingPlansProps) {
                 <p className="mt-1 h-5 text-sm text-muted">
                   {plan.monthly === 0 ? "Free for small teams" : billing === "yearly" ? "Billed annually" : "Billed monthly"}
                 </p>
-                <SignupLink
+                <Link
+                  href={registerUrl({ plan: plan.id })}
                   className={`${buttonClass(plan.highlighted ? "primary" : "secondary", "lg")} mt-6 w-full`}
                 >
                   {plan.cta}
-                </SignupLink>
+                </Link>
                 <ul className="mt-8 space-y-3 border-t border-line pt-6">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3 text-sm">

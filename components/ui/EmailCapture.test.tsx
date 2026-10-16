@@ -11,7 +11,7 @@ const props = {
   successMessage: "Demo only.",
 };
 
-function setup(extra: Partial<React.ComponentProps<typeof EmailCapture>> = {}) {
+function setup(extra: { theme?: "light" | "dark" } = {}) {
   vi.useFakeTimers({ shouldAdvanceTime: true });
   const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
   render(<EmailCapture {...props} {...extra} />);

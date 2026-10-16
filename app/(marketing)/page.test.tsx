@@ -1,6 +1,11 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { AccountLinks } from "@/components/Navbar";
 import Home from "./page";
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
+// The real slot reads the session cookie in an async server component, which jsdom can't render.
+vi.mock("./NavbarAccount", () => ({ default: () => <AccountLinks signedIn={false} /> }));
 
 describe("Home page", () => {
   it("has a skip link that targets the main landmark", () => {
