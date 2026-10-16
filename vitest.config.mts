@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 /** Seam A: route handlers and server modules run in Node, like they do in production. */
-const SERVER_TESTS = ["app/api/**/*.test.ts", "server/**/*.test.ts"];
+const SERVER_TESTS = ["app/api/**/*.test.ts", "server/**/*.test.ts", "proxy.test.ts"];
 
 export default defineConfig({
   plugins: [react()],
@@ -37,7 +37,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json-summary"],
-      include: ["components/**", "hooks/**", "lib/**", "constants/**", "context/**", "server/**", "data.ts", "app/**"],
+      include: ["components/**", "hooks/**", "lib/**", "constants/**", "context/**", "server/**", "data.ts", "app/**", "proxy.ts"],
       exclude: ["**/*.test.*", "app/layout.tsx", "app/opengraph-image.tsx", "app/icon.tsx", "components/ui/[a-z]*.tsx"],
     },
   },
