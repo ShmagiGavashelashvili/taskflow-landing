@@ -18,7 +18,7 @@ import {
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { useMoveTask } from "@/hooks/useMoveTask";
 import { taskQueries } from "@/lib/api/tasks";
 import { TASK_STATUSES, type TaskStatus } from "@/lib/schemas/entities";
@@ -50,6 +50,8 @@ const columnId = (status: TaskStatus) => `column:${status}`;
 export default function Board({ projectId, filters, members, today }: BoardProps) {
   const { data: tasks = [], isError, isPlaceholderData, refetch } = useQuery({ ...taskQueries.list(projectId, filters), placeholderData: keepPreviousData });
   const move = useMoveTask();
+  // A stable id keeps dnd-kit's generated aria ids the same on server and client (avoids a hydration mismatch).
+  const dndId = useId();
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
   const sensors = useSensors(
@@ -80,6 +82,7 @@ export default function Board({ projectId, filters, members, today }: BoardProps
 
   return (
     <DndContext
+      id={dndId}
       sensors={sensors}
       collisionDetection={closestCorners}
       accessibility={{
