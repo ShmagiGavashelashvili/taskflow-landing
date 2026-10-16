@@ -52,6 +52,11 @@ export function json<T>(data: T, init?: ResponseInit): NextResponse<T> {
   return NextResponse.json(data, init);
 }
 
+/** An empty 204 response, for successful deletes and other actions with nothing to return. */
+export function noContent(): NextResponse {
+  return new NextResponse(null, { status: 204 });
+}
+
 export function errorResponse(code: ErrorCode, message: string, fieldErrors?: FieldErrors): NextResponse<ApiErrorBody> {
   return NextResponse.json(
     { error: fieldErrors ? { code, message, fieldErrors } : { code, message } },

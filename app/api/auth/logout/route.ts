@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { loginUrl, NEXT_PARAM } from "@/lib/auth/paths";
 import { endSession } from "@/server/auth/session";
-import { route } from "@/server/http/handler";
+import { noContent, route } from "@/server/http/handler";
 
 /** Logs out. Always succeeds. */
-export const POST = route(async () => endSession(new NextResponse(null, { status: 204 })));
+export const POST = route(async () => endSession(noContent()));
 
 /**
  * Clears the cookie and redirects to login. Server pages that find a stale session (its user

@@ -1,7 +1,7 @@
 import type { Project } from "@/lib/schemas/entities";
 import { updateProjectRequestSchema } from "@/lib/schemas/projects";
 import { requireSession } from "@/server/auth/session";
-import { json, parseBody, route } from "@/server/http/handler";
+import { json, noContent, parseBody, route } from "@/server/http/handler";
 import { projectService } from "@/server/services/projects";
 
 type Params = { projectId: string };
@@ -20,5 +20,5 @@ export const PATCH = route<Params>(async (request, { params, container }) => {
 export const DELETE = route<Params>(async (request, { params, container }) => {
   const session = await requireSession(request, container);
   await projectService(container).delete(session, params.projectId);
-  return new Response(null, { status: 204 });
+  return noContent();
 });
