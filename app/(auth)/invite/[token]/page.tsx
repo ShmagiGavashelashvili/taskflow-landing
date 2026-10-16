@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { getContainer } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
@@ -26,6 +27,8 @@ export default function InvitePage({ params }: PageProps<"/invite/[token]">) {
 
 async function Invite({ params }: Pick<PageProps<"/invite/[token]">, "params">) {
   const { token } = await params;
+  // Params alone still allow a prerender with them filled in; expiry checks read the clock.
+  await connection();
   let preview;
   try {
     preview = await inviteService(getContainer()).preview(token);
