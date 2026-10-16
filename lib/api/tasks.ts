@@ -2,9 +2,11 @@ import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
 import {
   boardTaskSchema,
+  taskDetailSchema,
   type BoardTask,
   type CreateTaskRequest,
   type MoveTaskRequest,
+  type TaskDetail,
   type TaskFilters,
   type UpdateTaskRequest,
 } from "@/lib/schemas/tasks";
@@ -27,7 +29,8 @@ export const tasksApi = {
     apiRequest(`/api/projects/${projectId}/tasks${taskFilterParams(filters)}`, { schema: z.array(boardTaskSchema), signal }),
   create: (projectId: string, body: CreateTaskRequest) =>
     apiRequest(`/api/projects/${projectId}/tasks`, { method: "POST", body, schema: boardTaskSchema }),
-  get: (taskId: string, signal?: AbortSignal) => apiRequest(`/api/tasks/${taskId}`, { schema: boardTaskSchema, signal }),
+  /** The detail shape: a board task plus its creator. */
+  get: (taskId: string, signal?: AbortSignal) => apiRequest(`/api/tasks/${taskId}`, { schema: taskDetailSchema, signal }),
   update: (taskId: string, body: UpdateTaskRequest) =>
     apiRequest(`/api/tasks/${taskId}`, { method: "PATCH", body, schema: boardTaskSchema }),
   move: (taskId: string, body: MoveTaskRequest) =>
@@ -52,7 +55,7 @@ export const taskQueries = {
   detail: (taskId: string) =>
     queryOptions({
       queryKey: [...taskQueries.all(), "detail", taskId] as const,
-      queryFn: ({ signal }): Promise<BoardTask> => tasksApi.get(taskId, signal),
+      queryFn: ({ signal }): Promise<TaskDetail> => tasksApi.get(taskId, signal),
     }),
 };
 
