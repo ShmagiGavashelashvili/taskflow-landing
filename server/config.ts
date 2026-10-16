@@ -4,9 +4,11 @@ import path from "node:path";
 /**
  * Environment-driven settings, read on each call so tests can stub the environment.
  *
- * - `DEMO_MODE`: "false" turns off the demo badge and credential hint (on by default).
- * - `MOCK_LATENCY_MS`: simulated delay per repository call (default 300, 0 in tests).
- * - `MOCK_FAILURE_RATE`: probability 0..1 that a repository call fails with UNAVAILABLE (default 0).
+ * - `DEMO_MODE`: "true" or "false" forces the demo badge, credential hint and on-screen reset
+ *   link on or off. Defaults to on in a demo environment (see `isDemoEnvironment`), off otherwise.
+ * - `MOCK_LATENCY_MS`: simulated delay once per request (default 300 in a demo environment, 0
+ *   otherwise and in tests).
+ * - `MOCK_FAILURE_RATE`: probability 0..1 that a request fails with UNAVAILABLE (default 0).
  * - `SESSION_SECRET`: HS256 key for session cookies. Required in production; dev and tests use a fixed fallback.
  */
 
@@ -21,12 +23,27 @@ export function sessionSecret(): string {
   return DEV_SESSION_SECRET;
 }
 
+/**
+ * Development (and tests), and Vercel preview or development deployments. Not Vercel
+ * production, and not a local production server (`npm start`). Seeded demo accounts work
+ * everywhere; this only picks the defaults for the demo-facing settings below.
+ */
+function isDemoEnvironment(): boolean {
+  const vercelEnv = process.env.VERCEL_ENV;
+  if (vercelEnv) return vercelEnv !== "production";
+  return process.env.NODE_ENV !== "production";
+}
+
 export function isDemoMode(): boolean {
-  return process.env.DEMO_MODE !== "false";
+  const raw = process.env.DEMO_MODE?.trim().toLowerCase();
+  if (raw === "true" || raw === "1") return true;
+  if (raw === "false" || raw === "0") return false;
+  return isDemoEnvironment();
 }
 
 export function mockLatencyMs(): number {
-  return readNumber("MOCK_LATENCY_MS", process.env.NODE_ENV === "test" ? 0 : 300);
+  const fallback = process.env.NODE_ENV !== "test" && isDemoEnvironment() ? 300 : 0;
+  return readNumber("MOCK_LATENCY_MS", fallback);
 }
 
 export function mockFailureRate(): number {

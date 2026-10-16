@@ -46,7 +46,7 @@ The seed creates the workspace **Acme Studio** on the paid Pro plan, with three 
 | `lena@acme.studio` | `demo1234` | Member |
 | `tom@acme.studio` | `demo1234` | Member |
 
-In demo mode the login page shows the owner credentials, and the app shows a "Demo environment: data may reset" badge. New accounts you register start a 14-day trial of the plan you picked (Pro by default). The mock checkout is pre-filled with a test card.
+Demo mode is on by default in development and on Vercel previews (see `DEMO_MODE` below). In demo mode the login page shows the owner credentials, and the app shows a "Demo environment: data may reset" badge. New accounts you register start a 14-day trial of the plan you picked (Pro by default). The mock checkout is pre-filled with a test card.
 
 On Vercel the mock store lives in memory on each server instance. It can reset to the seed at any time, so registered accounts and edits may disappear. The demo accounts always work.
 
@@ -57,8 +57,8 @@ All of them are optional in development. They're read in `server/config.ts`, exc
 | Variable | Default | Purpose |
 |---|---|---|
 | `SESSION_SECRET` | Fixed dev-only key | Signs the session cookie (HS256). **Required in production**, including `npm start` and Vercel previews. Generate one with `openssl rand -base64 32`. |
-| `DEMO_MODE` | On | Set to `false` to hide the demo badge and the credential hint on the login page. |
-| `MOCK_LATENCY_MS` | `300` (`0` in tests) | Simulated delay for each mock store call, so loading states are visible. |
+| `DEMO_MODE` | On in development and Vercel previews, off in Vercel production and `npm start` | `true` or `false` overrides the default. Demo mode shows the demo badge, the credential hint on the login page and the on-screen password reset link. The seeded demo accounts work either way. |
+| `MOCK_LATENCY_MS` | `300` in development and Vercel previews, `0` in production and tests | Simulated delay for each mock store call, so loading states are visible. |
 | `MOCK_FAILURE_RATE` | `0` | Probability (0 to 1) that a mock store call fails with `UNAVAILABLE`, to exercise error states. |
 | `NEXT_PUBLIC_SITE_URL` | Vercel production URL, else `http://localhost:3000` | Canonical URL for metadata, the sitemap and robots.txt. |
 
