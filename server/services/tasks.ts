@@ -6,7 +6,7 @@ import { isoDate, moveTask } from "@/lib/tasks";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
-import type { Project, Task } from "@/server/domain/types";
+import type { Project, Task, User } from "@/server/domain/types";
 import { projectService } from "./projects";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -59,6 +59,16 @@ export function taskService(container: Container) {
   }
 
   return {
+    /** Everyone a task can be assigned to (workspace members, in join order): id and name only. */
+    async assignees(session: AppSession): Promise<Array<Pick<User, "id" | "name">>> {
+      const memberships = await container.memberships.listByWorkspace(session.workspace.id);
+      const users = new Map((await container.users.findByIds(memberships.map((m) => m.userId))).map((u) => [u.id, u]));
+      return memberships.flatMap(({ userId }) => {
+        const user = users.get(userId);
+        return user ? [{ id: user.id, name: user.name }] : [];
+      });
+    },
+
     async list(session: AppSession, projectId: string, filters: TaskFilters = {}): Promise<BoardTask[]> {
       const project = await projects.get(session, projectId);
       const now = container.clock.now();

@@ -1,4 +1,4 @@
-import { TASK_STATUSES, type Task, type TaskStatus } from "@/lib/schemas/entities";
+import { TASK_STATUSES, type Task, type TaskPriority, type TaskStatus } from "@/lib/schemas/entities";
 
 /**
  * Task rules shared by the server (the source of truth) and the client (optimistic updates and
@@ -56,7 +56,21 @@ export function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-/** Open and due before today (UTC). */
-export function isOverdue(task: Pick<Task, "status" | "dueDate">, now: Date): boolean {
-  return task.status !== "done" && task.dueDate !== null && task.dueDate < isoDate(now);
+/** Open and due before `today` (`YYYY-MM-DD`, from `isoDate`). */
+export function isOverdue(task: Pick<Task, "status" | "dueDate">, today: string): boolean {
+  return task.status !== "done" && task.dueDate !== null && task.dueDate < today;
 }
+
+export const STATUS_LABELS: Record<TaskStatus, string> = {
+  todo: "To do",
+  in_progress: "In progress",
+  in_review: "In review",
+  done: "Done",
+};
+
+export const PRIORITY_LABELS: Record<TaskPriority, string> = {
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+  urgent: "Urgent",
+};
