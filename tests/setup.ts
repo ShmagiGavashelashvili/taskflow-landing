@@ -51,7 +51,11 @@ function createMediaQueryList(query: string): MediaQueryList {
   } as unknown as MediaQueryList;
 }
 
+// Guarded so files that opt into `// @vitest-environment node` can still load this setup.
+const hasDom = typeof window !== "undefined";
+
 beforeEach(() => {
+  if (!hasDom) return;
   resetIntersection();
   vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
   Object.defineProperty(window, "matchMedia", {
@@ -63,8 +67,10 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  cleanup();
-  media.reduceMotion = false;
+  if (hasDom) {
+    cleanup();
+    media.reduceMotion = false;
+  }
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
   vi.useRealTimers();

@@ -1,7 +1,8 @@
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { registerUrl } from "@/lib/auth/paths";
 import { buttonClass } from "@/lib/ui";
 import Reveal from "./ui/Reveal";
-import { SignupLink } from "./ui/Signup";
 
 export default function CtaBanner() {
   return (
@@ -23,10 +24,10 @@ export default function CtaBanner() {
             Join 2,000+ teams already shipping faster with TaskFlow. Free for 14 days, no card needed.
           </p>
           <div className="relative mt-9">
-            <SignupLink className={buttonClass("light", "lg")}>
+            <Link href={registerUrl()} className={buttonClass("light", "lg")}>
               Start Free Trial
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </SignupLink>
+            </Link>
           </div>
         </div>
       </Reveal>

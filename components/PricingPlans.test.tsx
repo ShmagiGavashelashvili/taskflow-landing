@@ -83,11 +83,14 @@ describe("PricingPlans", () => {
     }
   });
 
-  it("renders a call to action per plan", () => {
+  it("renders a call to action per plan that carries the plan into registration", () => {
     renderPlans();
-    expect(within(card("Free")).getByRole("link", { name: "Start for free" })).toBeInTheDocument();
-    expect(within(card("Pro")).getByRole("link", { name: "Start Free Trial" })).toBeInTheDocument();
-    expect(within(card("Business")).getByRole("link", { name: "Contact sales" })).toBeInTheDocument();
+    expect(within(card("Free")).getByRole("link", { name: "Start for free" })).toHaveAttribute("href", "/register?plan=free");
+    expect(within(card("Pro")).getByRole("link", { name: "Start Free Trial" })).toHaveAttribute("href", "/register?plan=pro");
+    expect(within(card("Business")).getByRole("link", { name: "Contact sales" })).toHaveAttribute(
+      "href",
+      "/register?plan=business",
+    );
   });
 
   it("derives the savings percentage from the plan prices", () => {

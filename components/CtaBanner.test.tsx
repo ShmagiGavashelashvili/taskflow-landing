@@ -1,6 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { SignupField } from "./ui/Signup";
 import CtaBanner from "./CtaBanner";
 
 describe("CtaBanner", () => {
@@ -10,17 +9,9 @@ describe("CtaBanner", () => {
     expect(screen.getByText(/Join 2,000\+ teams/)).toBeInTheDocument();
   });
 
-  it("has a Start Free Trial link that focuses the signup field", () => {
-    render(
-      <>
-        <SignupField />
-        <CtaBanner />
-      </>,
-    );
-    const link = screen.getByRole("link", { name: "Start Free Trial" });
-    expect(link).toHaveAttribute("href", "#get-started");
-    fireEvent.click(link);
-    expect(screen.getByLabelText("Work email")).toHaveFocus();
+  it("has a Start Free Trial link to registration", () => {
+    render(<CtaBanner />);
+    expect(screen.getByRole("link", { name: "Start Free Trial" })).toHaveAttribute("href", "/register");
   });
 
   it("is a labelled region", () => {

@@ -5,16 +5,30 @@ import { useId } from "react";
 import { useEmailForm } from "@/hooks/useEmailForm";
 import { buttonClass } from "@/lib/ui";
 
-interface EmailCaptureProps {
+interface BaseProps {
   /** DOM id for the input, so other links can focus it. */
   inputId: string;
   label: string;
   buttonLabel: string;
-  successTitle: string;
-  successMessage: string;
   theme?: "light" | "dark";
   className?: string;
 }
+
+/** Simulated submission ending in a success message (nothing is sent). */
+interface SimulatedProps extends BaseProps {
+  successTitle: string;
+  successMessage: string;
+  onValidEmail?: never;
+}
+
+/** Hands the valid, trimmed email to the caller, e.g. to navigate to registration. */
+interface HandledProps extends BaseProps {
+  onValidEmail: (email: string) => void;
+  successTitle?: never;
+  successMessage?: never;
+}
+
+type EmailCaptureProps = SimulatedProps | HandledProps;
 
 export default function EmailCapture({
   inputId,
@@ -22,10 +36,11 @@ export default function EmailCapture({
   buttonLabel,
   successTitle,
   successMessage,
+  onValidEmail,
   theme = "light",
   className = "",
 }: EmailCaptureProps) {
-  const { email, error, status, onChange, onSubmit, reset } = useEmailForm();
+  const { email, error, status, onChange, onSubmit, reset } = useEmailForm({ onValidEmail });
   const errorId = useId();
   const dark = theme === "dark";
 
