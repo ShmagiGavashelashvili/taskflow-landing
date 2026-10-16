@@ -7,6 +7,12 @@ import { dueDateSchema, taskPrioritySchema, taskSchema, taskStatusSchema } from 
 export const boardTaskSchema = taskSchema.extend({ commentCount: z.number().int().nonnegative() });
 export type BoardTask = z.infer<typeof boardTaskSchema>;
 
+/** `GET /api/tasks/:id`: a board task plus who created it, for the detail view. */
+export const taskDetailSchema = boardTaskSchema.extend({
+  creator: z.object({ id: z.string().min(1), name: z.string() }),
+});
+export type TaskDetail = z.infer<typeof taskDetailSchema>;
+
 /** Sent as `assigneeId` to filter for tasks nobody is assigned to. */
 export const UNASSIGNED = "unassigned";
 

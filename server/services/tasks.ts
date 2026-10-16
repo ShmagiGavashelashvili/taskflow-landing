@@ -1,7 +1,7 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import type { z } from "zod";
-import type { createTaskRequestSchema, MoveTaskRequest, taskListQuerySchema, updateTaskRequestSchema, BoardTask } from "@/lib/schemas/tasks";
+import type { createTaskRequestSchema, MoveTaskRequest, taskListQuerySchema, updateTaskRequestSchema, BoardTask, TaskDetail } from "@/lib/schemas/tasks";
 import { isoDate, moveTask } from "@/lib/tasks";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
@@ -84,6 +84,13 @@ export function taskService(container: Container) {
 
     async get(session: AppSession, taskId: string): Promise<BoardTask> {
       return withCommentCount((await load(session, taskId)).task);
+    },
+
+    /** The task for its detail page: `get` plus the creator's name. */
+    async detail(session: AppSession, taskId: string): Promise<TaskDetail> {
+      const task = await withCommentCount((await load(session, taskId)).task);
+      const creator = await container.users.findById(task.createdBy);
+      return { ...task, creator: { id: task.createdBy, name: creator?.name ?? "Former member" } };
     },
 
     async create(session: AppSession, projectId: string, input: z.output<typeof createTaskRequestSchema>): Promise<BoardTask> {

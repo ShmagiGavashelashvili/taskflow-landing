@@ -1,4 +1,4 @@
-import { updateTaskRequestSchema, type BoardTask } from "@/lib/schemas/tasks";
+import { updateTaskRequestSchema, type BoardTask, type TaskDetail } from "@/lib/schemas/tasks";
 import { requireSession } from "@/server/auth/session";
 import { json, parseBody, route } from "@/server/http/handler";
 import { taskService } from "@/server/services/tasks";
@@ -7,7 +7,7 @@ type Params = { taskId: string };
 
 export const GET = route<Params>(async (request, { params, container }) => {
   const session = await requireSession(request, container);
-  return json<BoardTask>(await taskService(container).get(session, params.taskId));
+  return json<TaskDetail>(await taskService(container).detail(session, params.taskId));
 });
 
 export const PATCH = route<Params>(async (request, { params, container }) => {

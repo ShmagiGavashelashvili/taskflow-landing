@@ -38,6 +38,19 @@ describe("GET /api/tasks/:id", () => {
     expect(res.body).toMatchObject({ id: "tsk_website_03", title: "Write homepage copy", projectId: "prj_website", commentCount: 2 });
   });
 
+  it("returns who created the task and when it was created and last updated", async () => {
+    const api = await createLoggedInApi();
+
+    const res = await api.request(GET, "/api/tasks/tsk_website_03", params("tsk_website_03"));
+
+    expect(res.body).toMatchObject({
+      createdBy: "usr_marcus",
+      creator: { id: "usr_marcus", name: "Marcus Chen" },
+      createdAt: "2026-09-16T12:00:00.000Z",
+      updatedAt: "2026-10-12T12:00:00.000Z",
+    });
+  });
+
   it("is 404 for unknown tasks and other workspaces' tasks", async () => {
     const api = await createLoggedInApi();
 
