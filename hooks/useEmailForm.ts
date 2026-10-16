@@ -26,11 +26,19 @@ export interface EmailForm {
   reset: () => void;
 }
 
+export interface EmailFormOptions {
+  /**
+   * Receives the trimmed email once it's valid, replacing the simulated submission
+   * (e.g. to navigate to registration). The form stays idle.
+   */
+  onValidEmail?: (email: string) => void;
+}
+
 /**
- * Validates an email and walks through idle → submitting → success.
- * Submission is simulated: this is a demo, so nothing is sent or stored.
+ * Validates an email. Without `onValidEmail` it walks through idle → submitting → success,
+ * simulated: this is a demo, so nothing is sent or stored.
  */
-export function useEmailForm(): EmailForm {
+export function useEmailForm({ onValidEmail }: EmailFormOptions = {}): EmailForm {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<EmailFormStatus>("idle");
@@ -57,10 +65,14 @@ export function useEmailForm(): EmailForm {
         setError(validationError);
         return;
       }
+      if (onValidEmail) {
+        onValidEmail(email.trim());
+        return;
+      }
       setStatus("submitting");
       timer.current = setTimeout(() => setStatus("success"), SIMULATED_LATENCY_MS);
     },
-    [email, status],
+    [email, status, onValidEmail],
   );
 
   const reset = useCallback(() => {

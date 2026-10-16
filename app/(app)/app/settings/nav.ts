@@ -7,4 +7,8 @@ import type { NavItem } from "../_shell/NavLinks";
  * don't add `icon`s here (components can't cross that boundary) unless you move the list
  * into a client module like _shell/MainNav.tsx.
  */
-export const SETTINGS_NAV: NavItem[] = [{ href: "/app/settings/profile", label: "Profile" }];
+export const SETTINGS_NAV: NavItem[] = [
+  { href: "/app/settings/profile", label: "Profile" },
+  { href: "/app/settings/workspace", label: "Workspace" },
+  { href: "/app/settings/members", label: "Members" },
+];

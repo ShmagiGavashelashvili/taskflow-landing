@@ -1,10 +1,13 @@
-import { act, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import Hero from "./Hero";
 
+const router = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => router }));
+
 describe("Hero", () => {
-  afterEach(() => vi.useRealTimers());
+  beforeEach(() => router.push.mockReset());
 
   it("renders the headline, subheadline and the free-trial note", () => {
     render(<Hero />);
@@ -35,15 +38,14 @@ describe("Hero", () => {
     expect(mockup).toHaveTextContent("Website Relaunch");
   });
 
-  it("validates the email and then shows the success state", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+  it("validates the email and then goes to registration with it", async () => {
+    const user = userEvent.setup();
     render(<Hero />);
     await user.click(screen.getByRole("button", { name: /Get Started Free/ }));
     expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(router.push).not.toHaveBeenCalled();
     await user.type(screen.getByLabelText("Work email"), "jane@example.com");
     await user.click(screen.getByRole("button", { name: /Get Started Free/ }));
-    act(() => vi.advanceTimersByTime(800));
-    expect(screen.getByRole("status")).toHaveTextContent("You're on the list!");
+    expect(router.push).toHaveBeenCalledExactlyOnceWith("/register?email=jane%40example.com");
   });
 });

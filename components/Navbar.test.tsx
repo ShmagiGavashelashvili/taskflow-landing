@@ -1,9 +1,8 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { navLinks } from "@/data";
-import Navbar from "./Navbar";
-import { SignupField } from "./ui/Signup";
+import Navbar, { AccountLinks } from "./Navbar";
 
 function scrollTo(y: number) {
   Object.defineProperty(window, "scrollY", { value: y, configurable: true, writable: true });
@@ -20,8 +19,23 @@ describe("Navbar", () => {
     for (const link of navLinks) {
       expect(within(nav).getByRole("link", { name: link.label })).toHaveAttribute("href", link.href);
     }
-    expect(within(nav).getByRole("link", { name: "Log in" })).toBeInTheDocument();
-    expect(within(nav).getByRole("link", { name: "Start Free Trial" })).toHaveAttribute("href", "#get-started");
+    expect(within(nav).getByRole("link", { name: "Log in" })).toHaveAttribute("href", "/login");
+    expect(within(nav).getByRole("link", { name: "Start Free Trial" })).toHaveAttribute("href", "/register");
+    expect(within(nav).queryByRole("link", { name: "Go to app" })).not.toBeInTheDocument();
+  });
+
+  it("offers Go to app instead of Log in and the trial to a logged-in visitor", async () => {
+    const user = userEvent.setup();
+    render(<Navbar account={<AccountLinks signedIn />} />);
+    const nav = screen.getByRole("navigation", { name: "Main" });
+    expect(within(nav).getByRole("link", { name: "Go to app" })).toHaveAttribute("href", "/app");
+    expect(within(nav).queryByRole("link", { name: "Log in" })).not.toBeInTheDocument();
+    expect(within(nav).queryByRole("link", { name: "Start Free Trial" })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Open menu" }));
+    const menu = document.getElementById("mobile-menu") as HTMLElement;
+    expect(within(menu).getByRole("link", { name: "Go to app" })).toHaveAttribute("href", "/app");
+    expect(within(menu).queryByRole("link", { name: "Log in" })).not.toBeInTheDocument();
   });
 
   it("is transparent at the top and blurred once scrolled", () => {
@@ -73,19 +87,16 @@ describe("Navbar", () => {
       expect(document.getElementById("mobile-menu")).toBeNull();
     });
 
-    it("closes and focuses the signup field from the mobile trial button", async () => {
+    it.each(["Log in", "Start Free Trial"])("links %s to the auth pages and closes when it's chosen", async (name) => {
       const user = userEvent.setup();
-      render(
-        <>
-          <SignupField />
-          <Navbar />
-        </>,
-      );
+      render(<Navbar />);
       await user.click(screen.getByRole("button", { name: "Open menu" }));
       const menu = document.getElementById("mobile-menu") as HTMLElement;
-      fireEvent.click(within(menu).getByRole("link", { name: "Start Free Trial" }));
+      const link = within(menu).getByRole("link", { name });
+      expect(link).toHaveAttribute("href", name === "Log in" ? "/login" : "/register");
+      link.addEventListener("click", (event) => event.preventDefault());
+      await user.click(link);
       expect(document.getElementById("mobile-menu")).toBeNull();
-      expect(screen.getByLabelText("Work email")).toHaveFocus();
     });
   });
 });
