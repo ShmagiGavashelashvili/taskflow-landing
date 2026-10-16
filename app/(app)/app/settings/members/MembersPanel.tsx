@@ -20,6 +20,7 @@ import { ApiError } from "@/lib/api/client";
 import type { FieldErrors } from "@/lib/api/errors";
 import { workspaceApi } from "@/lib/api/workspace";
 import { describeFailure, validateForm } from "@/lib/forms";
+import { initialsOf } from "@/lib/people";
 import { createInviteRequestSchema, type Member, type PendingInvite } from "@/lib/schemas/workspace";
 import type { AvatarTone } from "@/types";
 import SettingsSection from "../SettingsSection";
@@ -296,7 +297,7 @@ function MemberRow({
   return (
     <li className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
       <div className="flex min-w-0 items-center gap-3">
-        <Avatar initials={initials(member.name)} tone={tone} size="lg" className="ring-0" />
+        <Avatar initials={initialsOf(member.name)} tone={tone} size="lg" className="ring-0" />
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-ink">
             {member.name}
@@ -333,9 +334,4 @@ function MemberRow({
       </div>
     </li>
   );
-}
-
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? parts.at(-1)![0] : "")).toUpperCase() || "?";
 }

@@ -15,15 +15,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { authApi } from "@/lib/api/auth";
 import { LOGIN_PATH } from "@/lib/auth/paths";
+import { initialsOf } from "@/lib/people";
 
 interface UserMenuProps {
   name: string;
   email: string;
-}
-
-function initialsOf(name: string) {
-  const parts = name.trim().split(/\s+/);
-  return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? (parts.at(-1)?.[0] ?? "") : "")).toUpperCase() || "?";
 }
 
 /** Sidebar footer: who's signed in, a profile link and logout. */
