@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { APP_HOME, loginUrl, NEXT_PARAM, safeNextPath } from "@/lib/auth/paths";
+import { APP_HOME, APP_PATH_HEADER, loginUrl, NEXT_PARAM, safeNextPath } from "@/lib/auth/paths";
 import { readSessionToken, SESSION_COOKIE } from "@/server/auth/token";
 
 /** Auth pages that make no sense once logged in. Forgot and reset password stay reachable. */
@@ -14,8 +14,16 @@ export async function proxy(request: NextRequest) {
   const { pathname, search, searchParams } = request.nextUrl;
   const loggedIn = (await readSessionToken(request.cookies.get(SESSION_COOKIE)?.value)) !== null;
 
-  if (!loggedIn && (pathname === APP_HOME || pathname.startsWith(`${APP_HOME}/`))) {
+  const appPage = pathname === APP_HOME || pathname.startsWith(`${APP_HOME}/`);
+  if (!loggedIn && appPage) {
     return NextResponse.redirect(new URL(loginUrl(pathname + search), request.url));
+  }
+  if (appPage) {
+    // Server pages can't see the URL; getAppSession() reads this to keep the return path when
+    // it finds a stale session. Always overwritten, so a client can't supply its own.
+    const headers = new Headers(request.headers);
+    headers.set(APP_PATH_HEADER, pathname + search);
+    return NextResponse.next({ request: { headers } });
   }
   if (loggedIn && GUEST_ONLY.has(pathname)) {
     const next = safeNextPath(searchParams.get(NEXT_PARAM)) ?? APP_HOME;

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { getRedirectUrl, unstable_doesMiddlewareMatch } from "next/experimental/testing/server";
 import { describe, expect, it } from "vitest";
 import { createLoggedInApi, setupTestContainer } from "@/tests/api";
+import { APP_PATH_HEADER } from "@/lib/auth/paths";
 import { config, proxy } from "./proxy";
 
 setupTestContainer();
@@ -31,6 +32,16 @@ describe("proxy", () => {
     const res = await visit("/app", await sessionCookie());
 
     expect(getRedirectUrl(res)).toBeNull();
+  });
+
+  it("tells server pages which app page was requested, replacing any client-sent value", async () => {
+    const request = new NextRequest(new URL("/app/projects/prj_website?view=list", BASE), {
+      headers: { cookie: `tf_session=${await sessionCookie()}`, [APP_PATH_HEADER]: "/app/forged" },
+    });
+
+    const res = await proxy(request);
+
+    expect(res.headers.get(`x-middleware-request-${APP_PATH_HEADER}`)).toBe("/app/projects/prj_website?view=list");
   });
 
   it.each(["/login", "/register"])("sends logged-in users from %s into the app", async (path) => {
