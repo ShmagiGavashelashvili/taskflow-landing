@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import type { z } from "zod";
 import { planLimits } from "@/lib/plans";
+import type { ProjectRef } from "@/lib/schemas/dashboard";
 import type { createProjectRequestSchema, updateProjectRequestSchema } from "@/lib/schemas/projects";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
@@ -9,6 +10,9 @@ import { DomainError } from "@/server/domain/errors";
 import { requireRoom } from "@/server/domain/plan-guards";
 import type { Project } from "@/server/domain/types";
 import { requireOwner } from "./workspace";
+
+/** A project as reports and the timeline label it. */
+export const toProjectRef = ({ id, name, color }: Project): ProjectRef => ({ id, name, color });
 
 /** Projects in the signed-in user's workspace. Any member can create and edit; only owners delete. */
 export function projectService(container: Container) {

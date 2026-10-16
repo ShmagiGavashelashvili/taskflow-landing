@@ -6,6 +6,7 @@ import { toPublicUser, type AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
 import type { Workspace } from "@/server/domain/types";
+import { withUsers } from "./people";
 
 /** Throws FORBIDDEN unless the session's user owns the workspace. */
 export function requireOwner(session: AppSession, action: string): void {
@@ -30,11 +31,7 @@ export function workspaceService(container: Container) {
     async listMembers(session: AppSession): Promise<MembersResponse> {
       const { workspace } = session;
       const memberships = await container.memberships.listByWorkspace(workspace.id);
-      const users = new Map((await container.users.findByIds(memberships.map((m) => m.userId))).map((u) => [u.id, u]));
-      const members: Member[] = memberships.flatMap((membership) => {
-        const user = users.get(membership.userId);
-        return user ? [{ ...toPublicUser(user), role: membership.role }] : [];
-      });
+      const members: Member[] = (await withUsers(container, memberships)).map(({ user, role }) => ({ ...toPublicUser(user), role }));
       const now = container.clock.now();
       return { members, effectivePlan: effectivePlan(workspace, now), memberLimit: planLimits(workspace, now).maxMembers };
     },

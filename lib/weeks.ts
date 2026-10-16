@@ -3,7 +3,7 @@
  * Weeks start on Monday. Shared by the dashboard's "this week", the timeline API and its grid.
  */
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+export const DAY_MS = 24 * 60 * 60 * 1000;
 
 function toUtc(date: string): Date {
   return new Date(`${date}T00:00:00.000Z`);

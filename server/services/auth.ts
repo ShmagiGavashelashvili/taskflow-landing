@@ -7,13 +7,13 @@ import type {
   registerRequestSchema,
   resetPasswordRequestSchema,
 } from "@/lib/schemas/auth";
+import { DAY_MS } from "@/lib/weeks";
 import { hashPassword, verifyPassword } from "@/server/auth/password";
 import { toPublicUser, type AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
 import type { Membership, UserRecord, Workspace } from "@/server/domain/types";
 
-const DAY_MS = 24 * 60 * 60 * 1000;
 export const TRIAL_DAYS = 14;
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 

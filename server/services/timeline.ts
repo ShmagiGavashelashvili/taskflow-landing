@@ -6,7 +6,7 @@ import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
 import { requireFeature } from "@/server/domain/plan-guards";
-import { projectService } from "./projects";
+import { projectService, toProjectRef } from "./projects";
 
 function invalidRange(message: string): DomainError {
   return new DomainError("VALIDATION_ERROR", "Please check the highlighted fields.", { to: [message] });
@@ -33,7 +33,7 @@ export function timelineService(container: Container) {
       return {
         from,
         to,
-        projects: projects.map(({ id, name, color }) => ({ id, name, color })),
+        projects: projects.map(toProjectRef),
         // Stable sort, so tasks on the same day in the same project keep board order.
         tasks: tasks.sort(
           (a, b) => a.dueDate!.localeCompare(b.dueDate!) || order.get(a.projectId)! - order.get(b.projectId)!,

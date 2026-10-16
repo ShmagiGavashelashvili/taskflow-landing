@@ -1,15 +1,14 @@
 import "server-only";
 import { TASK_STATUSES, type TaskStatus } from "@/lib/schemas/entities";
-import type { DashboardReportsResponse, DashboardResponse, ProjectRef } from "@/lib/schemas/dashboard";
+import type { DashboardReportsResponse, DashboardResponse } from "@/lib/schemas/dashboard";
 import { isoDate, isOverdue } from "@/lib/tasks";
 import { weekStart } from "@/lib/weeks";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { requireFeature } from "@/server/domain/plan-guards";
-import type { Project, Task } from "@/server/domain/types";
+import type { Task } from "@/server/domain/types";
+import { toProjectRef } from "./projects";
 import { taskService } from "./tasks";
-
-const toRef = ({ id, name, color }: Project): ProjectRef => ({ id, name, color });
 
 /** Soonest due first; tasks without a due date go last. */
 function byDueDate(a: Task, b: Task): number {
@@ -46,7 +45,7 @@ export function dashboardService(container: Container) {
           byStatus,
         },
         myTasks: open.filter((task) => task.assigneeId === session.user.id).sort(byDueDate),
-        projects: projects.map(toRef),
+        projects: projects.map(toProjectRef),
       };
     },
 
@@ -75,7 +74,7 @@ export function dashboardService(container: Container) {
           const own = tasks.filter((task) => task.projectId === project.id);
           const done = own.filter((task) => task.status === "done").length;
           return {
-            project: toRef(project),
+            project: toProjectRef(project),
             total: own.length,
             done,
             percent: own.length === 0 ? 0 : Math.round((done / own.length) * 100),

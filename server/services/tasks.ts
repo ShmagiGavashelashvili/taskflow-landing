@@ -2,14 +2,15 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import type { z } from "zod";
 import type { createTaskRequestSchema, MoveTaskRequest, taskListQuerySchema, updateTaskRequestSchema, BoardTask, TaskDetail } from "@/lib/schemas/tasks";
+import type { Person } from "@/lib/schemas/comments";
 import { isoDate, moveTask } from "@/lib/tasks";
+import { DAY_MS } from "@/lib/weeks";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
-import type { Project, Task, User } from "@/server/domain/types";
+import type { Project, Task } from "@/server/domain/types";
+import { loadPeople, withUsers } from "./people";
 import { projectService } from "./projects";
-
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 type TaskFilters = z.output<typeof taskListQuerySchema>;
 
@@ -26,14 +27,18 @@ export function taskService(container: Container) {
     return (await withCommentCounts([task]))[0];
   }
 
-  /** The task and its project, or NOT_FOUND when either is outside the session's workspace. */
-  async function load(session: AppSession, taskId: string): Promise<{ task: Task; project: Project }> {
+  /** The task and its project, or `null` when either is missing or outside the session's workspace. */
+  async function find(session: AppSession, taskId: string): Promise<{ task: Task; project: Project } | null> {
     const task = await container.tasks.findById(taskId);
     const project = task && (await container.projects.findById(task.projectId));
-    if (!task || !project || project.workspaceId !== session.workspace.id) {
-      throw new DomainError("NOT_FOUND", "That task doesn't exist or was deleted.");
-    }
-    return { task, project };
+    return task && project && project.workspaceId === session.workspace.id ? { task, project } : null;
+  }
+
+  /** Like `find`, but throws NOT_FOUND. */
+  async function load(session: AppSession, taskId: string): Promise<{ task: Task; project: Project }> {
+    const found = await find(session, taskId);
+    if (!found) throw new DomainError("NOT_FOUND", "That task doesn't exist or was deleted.");
+    return found;
   }
 
   async function requireAssignable(session: AppSession, assigneeId: string | null | undefined) {
@@ -60,13 +65,14 @@ export function taskService(container: Container) {
 
   return {
     /** Everyone a task can be assigned to (workspace members, in join order): id and name only. */
-    async assignees(session: AppSession): Promise<Array<Pick<User, "id" | "name">>> {
+    async assignees(session: AppSession): Promise<Person[]> {
       const memberships = await container.memberships.listByWorkspace(session.workspace.id);
-      const users = new Map((await container.users.findByIds(memberships.map((m) => m.userId))).map((u) => [u.id, u]));
-      return memberships.flatMap(({ userId }) => {
-        const user = users.get(userId);
-        return user ? [{ id: user.id, name: user.name }] : [];
-      });
+      return (await withUsers(container, memberships)).map(({ user }) => ({ id: user.id, name: user.name }));
+    },
+
+    /** The task, or `null` when it doesn't exist or is outside the session's workspace. */
+    async find(session: AppSession, taskId: string): Promise<Task | null> {
+      return (await find(session, taskId))?.task ?? null;
     },
 
     async list(session: AppSession, projectId: string, filters: TaskFilters = {}): Promise<BoardTask[]> {
@@ -89,8 +95,8 @@ export function taskService(container: Container) {
     /** The task for its detail page: `get` plus the creator's name. */
     async detail(session: AppSession, taskId: string): Promise<TaskDetail> {
       const task = await withCommentCount((await load(session, taskId)).task);
-      const creator = await container.users.findById(task.createdBy);
-      return { ...task, creator: { id: task.createdBy, name: creator?.name ?? "Former member" } };
+      const people = await loadPeople(container, [task.createdBy]);
+      return { ...task, creator: people.person(task.createdBy) };
     },
 
     async create(session: AppSession, projectId: string, input: z.output<typeof createTaskRequestSchema>): Promise<BoardTask> {

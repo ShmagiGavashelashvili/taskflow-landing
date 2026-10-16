@@ -6,6 +6,7 @@ import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
 import type { Comment } from "@/server/domain/types";
+import { loadPeople } from "./people";
 import { taskService } from "./tasks";
 
 type CommentInput = z.output<typeof commentRequestSchema>;
@@ -15,21 +16,15 @@ export function commentService(container: Container) {
   const tasks = taskService(container);
 
   async function withAuthors(comments: Comment[]): Promise<CommentView[]> {
-    const users = new Map(
-      (await container.users.findByIds([...new Set(comments.map((c) => c.authorId))])).map((u) => [u.id, u]),
-    );
-    return comments.map((comment) => ({
-      ...comment,
-      author: { id: comment.authorId, name: users.get(comment.authorId)?.name ?? "Former member" },
-    }));
+    const people = await loadPeople(container, comments.map((comment) => comment.authorId));
+    return comments.map((comment) => ({ ...comment, author: people.person(comment.authorId) }));
   }
 
   /** The comment, if its task is in the session's workspace and the session user wrote it. */
   async function loadOwn(session: AppSession, commentId: string, action: string): Promise<Comment> {
     const comment = await container.comments.findById(commentId);
-    const task = comment && (await container.tasks.findById(comment.taskId));
-    const project = task && (await container.projects.findById(task.projectId));
-    if (!comment || !project || project.workspaceId !== session.workspace.id) {
+    const task = comment && (await tasks.find(session, comment.taskId));
+    if (!comment || !task) {
       throw new DomainError("NOT_FOUND", "That comment doesn't exist or was deleted.");
     }
     if (comment.authorId !== session.user.id) {

@@ -1,4 +1,4 @@
-const DAY_MS = 24 * 60 * 60 * 1000;
+import { DAY_MS } from "./weeks";
 
 /**
  * Whole days left in a trial, rounding a partial day up. `null` when there's no trial, `0`
