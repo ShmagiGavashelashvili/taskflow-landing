@@ -6,6 +6,7 @@ import { endSession } from "@/server/auth/session";
 import { SESSION_COOKIE } from "@/server/auth/token";
 import { getContainer, type Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
+import { runInRequestScope } from "@/server/request-scope";
 
 type Params = Record<string, string | string[] | undefined>;
 
@@ -35,7 +36,8 @@ export function route<P extends Params = Params>(
     request.headers.get("accept");
     try {
       const params = (await context?.params) ?? ({} as P);
-      return await handler(request, { params, container: getContainer() });
+      // One request scope per call, so the mock store's simulated latency applies once.
+      return await runInRequestScope(() => handler(request, { params, container: getContainer() }));
     } catch (error) {
       const response = toErrorResponse(error);
       // A session cookie that no longer resolves (expired, or its user is gone) is cleared.

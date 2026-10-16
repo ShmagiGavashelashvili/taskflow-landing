@@ -5,7 +5,7 @@ import { GET as listTasks } from "../../../projects/[projectId]/tasks/route";
 import { POST } from "./route";
 
 const NOW = "2026-10-14T12:00:00.000Z";
-setupTestContainer({ now: new Date(NOW) });
+const container = setupTestContainer({ now: new Date(NOW) });
 
 type Row = { id: string; status: string; position: number; completedAt: string | null };
 
@@ -93,5 +93,31 @@ describe("POST /api/tasks/:id/move", () => {
 
   it("requires a session", async () => {
     expect((await move(createTestApi(), "tsk_website_06", { status: "done", position: 0 })).status).toBe(401);
+  });
+});
+
+describe("simulated network on a move", () => {
+  it("adds the mock latency once per request, not once per store call", async () => {
+    const api = await createLoggedInApi();
+    container.reset({ now: new Date(NOW), latencyMs: 80 });
+
+    const started = performance.now();
+    const res = await move(api, "tsk_website_07", { status: "in_progress", position: 1 });
+    const elapsed = performance.now() - started;
+
+    expect(res.status).toBe(200);
+    expect(elapsed).toBeGreaterThanOrEqual(75);
+    // A move makes about ten store calls; per-call latency would take 800ms or more.
+    expect(elapsed).toBeLessThan(240);
+  });
+
+  it("fails the whole request with UNAVAILABLE when the simulated network fails", async () => {
+    const api = await createLoggedInApi();
+    container.reset({ now: new Date(NOW), failureRate: 1 });
+
+    const res = await move(api, "tsk_website_07", { status: "in_progress", position: 1 });
+
+    expect(res.status).toBe(503);
+    expect(res.body).toMatchObject({ error: { code: "UNAVAILABLE" } });
   });
 });

@@ -58,8 +58,8 @@ All of them are optional in development. They're read in `server/config.ts`, exc
 |---|---|---|
 | `SESSION_SECRET` | Fixed dev-only key | Signs the session cookie (HS256). **Required in production**, including `npm start` and Vercel previews. Generate one with `openssl rand -base64 32`. |
 | `DEMO_MODE` | On in development and Vercel previews, off in Vercel production and `npm start` | `true` or `false` overrides the default. Demo mode shows the demo badge, the credential hint on the login page and the on-screen password reset link. The seeded demo accounts work either way. |
-| `MOCK_LATENCY_MS` | `300` in development and Vercel previews, `0` in production and tests | Simulated delay for each mock store call, so loading states are visible. |
-| `MOCK_FAILURE_RATE` | `0` | Probability (0 to 1) that a mock store call fails with `UNAVAILABLE`, to exercise error states. |
+| `MOCK_LATENCY_MS` | `300` in development and Vercel previews, `0` in production and tests | Simulated delay, added once per API request or page render (on its first mock store call), so loading states are visible. |
+| `MOCK_FAILURE_RATE` | `0` | Probability (0 to 1) that an API request or page render fails with `UNAVAILABLE`, to exercise error states. Decided once per request, so failures don't compound across store calls. |
 | `NEXT_PUBLIC_SITE_URL` | Vercel production URL, else `http://localhost:3000` | Canonical URL for metadata, the sitemap and robots.txt. |
 
 For example, `MOCK_LATENCY_MS=1500 MOCK_FAILURE_RATE=0.2 npm run dev` gives you slow and flaky data.
