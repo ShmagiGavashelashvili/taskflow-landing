@@ -97,11 +97,12 @@ describe("POST /api/billing/plan", () => {
     const res = await changePlan(api, { plan: "business", billingPeriod: "monthly", payment: { cardNumber: "42", expiry: "13/30", cvc: "x" } });
 
     expect(res.status).toBe(400);
-    expect(Object.keys((res.body as { error: { fieldErrors: object } }).error.fieldErrors).sort()).toEqual([
-      "payment.cardNumber",
-      "payment.cvc",
-      "payment.expiry",
-    ]);
+    expect(res.body).toMatchObject({
+      error: {
+        code: "VALIDATION_ERROR",
+        fieldErrors: { "payment.cardNumber": expect.any(Array), "payment.cvc": expect.any(Array), "payment.expiry": expect.any(Array) },
+      },
+    });
   });
 
   it("refuses a change to the plan and period already in place", async () => {

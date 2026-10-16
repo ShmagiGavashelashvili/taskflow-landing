@@ -1,4 +1,6 @@
 import { Clock3, FlaskConical } from "lucide-react";
+import Link from "next/link";
+import type { ReactNode } from "react";
 import { plans } from "@/data";
 import { trialDaysLeft } from "@/lib/trial";
 import type { AppSession } from "@/server/auth/session";
@@ -20,11 +22,22 @@ export default function TopBarStatus({ session }: { session: AppSession }) {
         </span>
       )}
       {daysLeft !== null && daysLeft > 0 && (
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-tint px-2.5 py-1 text-xs font-semibold text-brand">
+        // Owners can act on the countdown, so it links to billing for them.
+        <TrialBadge href={session.role === "owner" ? "/app/settings/billing" : undefined}>
           <Clock3 className="size-3.5" aria-hidden="true" />
           {planName} trial: {daysLeft} {daysLeft === 1 ? "day" : "days"} left
-        </span>
+        </TrialBadge>
       )}
     </div>
+  );
+}
+
+function TrialBadge({ href, children }: { href?: string; children: ReactNode }) {
+  const className = "inline-flex items-center gap-1.5 rounded-full bg-tint px-2.5 py-1 text-xs font-semibold text-brand";
+  if (!href) return <span className={className}>{children}</span>;
+  return (
+    <Link href={href} className={`${className} hover:underline`}>
+      {children}
+    </Link>
   );
 }
