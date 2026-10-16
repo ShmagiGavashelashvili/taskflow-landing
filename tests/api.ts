@@ -3,13 +3,13 @@
  * in-memory container. Tests assert on status, body and cookies only, never on repositories.
  *
  * ```ts
- * import { createTestApi, setupTestContainer } from "@/tests/api";
+ * import { createLoggedInApi, setupTestContainer } from "@/tests/api";
  * import { GET } from "./route";
  *
  * setupTestContainer();                       // fresh seed before every test
  *
  * it("lists projects", async () => {
- *   const api = createTestApi();            // one "browser": keeps cookies between calls
+ *   const api = await createLoggedInApi();  // one "browser", logged in as the demo owner
  *   const res = await api.request(GET, "/api/projects?archived=false");
  *   expect(res.status).toBe(200);
  * });
@@ -17,7 +17,10 @@
  */
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach } from "vitest";
+import { POST as loginHandler } from "@/app/api/auth/login/route";
+import type { SessionResponse } from "@/lib/schemas/auth";
 import { createMemoryContainer, setContainer, type Container, type MemoryContainerOptions } from "@/server/container";
+import { DEMO_ACCOUNT, SEED_PASSWORD } from "@/server/seed";
 
 const BASE_URL = "http://localhost:3000";
 
@@ -125,6 +128,37 @@ export function createTestApi(): TestApi {
     setCookie: (name, value) => void jar.set(name, value),
     clearCookies: () => jar.clear(),
   };
+}
+
+export interface LoginAccount {
+  email: string;
+  /** Defaults to the shared seed password, so any seeded user works with just an email. */
+  password?: string;
+}
+
+/**
+ * Logs `api` in through the real login endpoint (demo owner by default) and returns the
+ * session body. Throws if login fails, so a broken login shows up at the call site.
+ *
+ * ```ts
+ * const api = createTestApi();
+ * await logIn(api);                                   // Alex Morgan, owner of Acme Studio
+ * await logIn(api, { email: "priya@acme.studio" });   // a seeded member
+ * ```
+ */
+export async function logIn(api: TestApi, account: LoginAccount = DEMO_ACCOUNT): Promise<SessionResponse> {
+  const res = await api.request<SessionResponse>(loginHandler, "/api/auth/login", {
+    body: { email: account.email, password: account.password ?? SEED_PASSWORD },
+  });
+  if (res.status !== 200) throw new Error(`logIn(${account.email}) failed with ${res.status}: ${JSON.stringify(res.body)}`);
+  return res.body;
+}
+
+/** A fresh browser that is already logged in. */
+export async function createLoggedInApi(account?: LoginAccount): Promise<TestApi> {
+  const api = createTestApi();
+  await logIn(api, account);
+  return api;
 }
 
 function storeCookie(jar: Map<string, string>, header: string) {

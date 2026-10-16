@@ -2,6 +2,8 @@ import "server-only";
 import { NextResponse, type NextRequest } from "next/server";
 import type { z } from "zod";
 import { ERROR_STATUS, type ApiErrorBody, type ErrorCode, type FieldErrors } from "@/lib/api/errors";
+import { endSession } from "@/server/auth/session";
+import { SESSION_COOKIE } from "@/server/auth/token";
 import { getContainer, type Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
 
@@ -35,7 +37,11 @@ export function route<P extends Params = Params>(
       const params = (await context?.params) ?? ({} as P);
       return await handler(request, { params, container: getContainer() });
     } catch (error) {
-      return toErrorResponse(error);
+      const response = toErrorResponse(error);
+      // A session cookie that no longer resolves (expired, or its user is gone) is cleared.
+      const unauthenticated = error instanceof DomainError && error.code === "UNAUTHENTICATED";
+      if (unauthenticated && request.cookies.has(SESSION_COOKIE)) endSession(response);
+      return response;
     }
   };
 }

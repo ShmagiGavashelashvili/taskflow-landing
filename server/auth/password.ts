@@ -5,7 +5,7 @@ import { promisify } from "node:util";
 const scryptAsync = promisify(scrypt) as (password: string, salt: Buffer, keylen: number) => Promise<Buffer>;
 
 const KEY_LENGTH = 64;
-export const MIN_PASSWORD_LENGTH = 8;
+// The minimum length is part of the API contract: MIN_PASSWORD_LENGTH in lib/schemas/auth.ts.
 
 /** Hashes with scrypt and a random per-user salt. Format: `scrypt$<salt hex>$<hash hex>`. */
 export async function hashPassword(password: string): Promise<string> {
