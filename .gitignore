@@ -20,6 +20,9 @@
 # production
 /build
 
+# mock store saved by the dev server
+/.data/
+
 # misc
 .DS_Store
 *.pem
