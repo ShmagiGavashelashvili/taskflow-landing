@@ -25,6 +25,19 @@ const failWith = (code: ErrorCode) =>
 describe("route handler helpers", () => {
   afterEach(() => vi.restoreAllMocks());
 
+  it("maps a DomainError from another copy of the module (Next bundles server code per layer)", async () => {
+    vi.resetModules();
+    const { DomainError: OtherCopy } = await import("@/server/domain/errors");
+    expect(OtherCopy).not.toBe(DomainError);
+    const failing = route(async () => {
+      throw new OtherCopy("UNAVAILABLE", "Down for a moment.");
+    });
+
+    const res = await createTestApi().request(failing, "/api/things");
+
+    expect(res).toMatchObject({ status: 503, body: { error: { code: "UNAVAILABLE", message: "Down for a moment." } } });
+  });
+
   it("passes resolved params and returns the handler's response", async () => {
     const getThing = route<{ thingId: string }>(async (_request, { params }) => json({ id: params.thingId }));
 
