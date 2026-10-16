@@ -30,7 +30,7 @@ To move to a real database (or another backend):
 1. Add an implementation of every interface in `server/repositories/types.ts`, e.g. `server/repositories/postgres/`, honouring the conventions documented at the top of that file.
 2. Make the Seam A suite pass against it. Point `setupTestContainer` in `tests/api.ts` at a container built from the new implementation (for example a throwaway database per test file).
 3. Select it in `createContainer()` in `server/container.ts`, e.g. when `DATABASE_URL` is set. Keep the memory implementation as the fallback for demos and tests.
-4. Replace mocked side effects (reset links returned to the client, invite links, mock checkout) behind the same service methods. The API responses don't change shape.
+4. Replace mocked side effects (reset links returned to the client, invite links, mock checkout) behind the same service methods. The API responses don't change shape. `POST /api/auth/forgot-password` already answers `{ resetUrl: null }` for every email outside demo mode, so it doesn't reveal which emails have accounts; a real implementation emails the link and keeps that response. Only demo mode returns the link, for on-screen display.
 
 Services, route handlers, schemas, the API client and the UI don't change.
 

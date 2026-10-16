@@ -42,7 +42,7 @@ export default function ForgotPasswordForm() {
     return (
       <div className="grid gap-4 text-[15px]" role="status">
         <p className="text-ink">If an account exists for that email, a reset link is on its way.</p>
-        {sent.resetUrl ? (
+        {sent.resetUrl && (
           <div className="rounded-xl border border-brand/20 bg-tint px-4 py-3 text-sm">
             <p className="text-muted-foreground">
               This prototype doesn&apos;t send email, so here is the link. It works once and expires in an hour.
@@ -51,8 +51,6 @@ export default function ForgotPasswordForm() {
               Reset your password
             </Link>
           </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">(Demo: no account uses that email, so no link was created.)</p>
         )}
         <Button variant="outline" className="h-11 rounded-xl" onClick={() => setSent(null)}>
           Try another email

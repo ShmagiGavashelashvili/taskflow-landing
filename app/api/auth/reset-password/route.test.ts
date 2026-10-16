@@ -9,6 +9,8 @@ setupTestContainer();
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(new Date("2026-10-16T12:00:00.000Z"));
+  // Demo mode returns the reset link, which these tests follow. The generic response is tested below.
+  vi.stubEnv("DEMO_MODE", "true");
 });
 afterEach(() => vi.useRealTimers());
 
@@ -24,18 +26,30 @@ function tokenOf(resetUrl: string | null) {
 }
 
 describe("POST /api/auth/forgot-password", () => {
-  it("returns a reset page link to show on screen", async () => {
+  it("in demo mode, returns a reset page link to show on screen", async () => {
     const res = await requestReset(createTestApi(), "DEMO@taskflow.app");
 
     expect(res.status).toBe(200);
     expect(res.body.resetUrl).toMatch(/^\/reset-password\?token=[\w-]{20,}$/);
   });
 
-  it("returns no link for an unknown email", async () => {
+  it("in demo mode, returns no link for an unknown email", async () => {
     const res = await requestReset(createTestApi(), "nobody@taskflow.app");
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ resetUrl: null });
+  });
+
+  it("returns the same generic response for known and unknown emails outside demo mode", async () => {
+    vi.stubEnv("DEMO_MODE", "false");
+
+    const known = await requestReset(createTestApi(), "demo@taskflow.app");
+    const unknown = await requestReset(createTestApi(), "nobody@taskflow.app");
+
+    expect(known.status).toBe(200);
+    expect(unknown.status).toBe(200);
+    expect(known.body).toEqual({ resetUrl: null });
+    expect(unknown.body).toEqual(known.body);
   });
 
   it("validates the email", async () => {

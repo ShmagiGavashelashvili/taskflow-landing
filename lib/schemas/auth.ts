@@ -44,9 +44,9 @@ export type ForgotPasswordRequest = z.input<typeof forgotPasswordRequestSchema>;
 
 export const forgotPasswordResponseSchema = z.object({
   /**
-   * Path of the reset page with its token, e.g. `/reset-password?token=...`, or `null` when no
-   * account has that email. The prototype shows it on screen; a real backend would email it
-   * and always return `null`.
+   * Demo mode only: path of the reset page with its token, e.g. `/reset-password?token=...`, or
+   * `null` when no account has that email. Outside demo mode it's always `null`, so the response
+   * doesn't reveal which emails have accounts; a real backend emails the link.
    */
   resetUrl: z.string().nullable(),
 });

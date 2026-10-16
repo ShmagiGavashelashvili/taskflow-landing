@@ -30,7 +30,7 @@ To reset local data to the seed, stop the dev server and delete `.data/db.json`.
 ### App map
 
 - `/`: the landing page. Start Free Trial and the hero email field go to registration, with the email pre-filled. Pricing buttons pre-select their plan. Log in becomes Go to app once you're signed in.
-- `/register`, `/login`, `/forgot-password`, `/reset-password`: authentication. No email is sent, so the password reset link is shown on screen.
+- `/register`, `/login`, `/forgot-password`, `/reset-password`: authentication. No email is sent, so in demo mode the password reset link is shown on screen. Outside demo mode the forgot-password response is the same whether or not the email has an account, and the link isn't returned; a real implementation emails it.
 - `/app`: the signed-in app (dashboard, projects with board and list views, task details, timeline, and settings for profile, workspace, members, billing, integrations and automations). Logged-out visitors are sent to login and then returned to the page they asked for.
 - `/invite/<token>`: invite acceptance. Owners get a copyable invite link instead of an email.
 
@@ -78,7 +78,7 @@ The full decision is in [ADR 0002](docs/adr/0002-mock-data-behind-repositories.m
 1. Implement every interface in `server/repositories/types.ts`, for example in `server/repositories/postgres/`. Follow the conventions at the top of that file: async methods, return copies, no cascading deletes.
 2. Make the API test suite pass against it. Point `setupTestContainer` in `tests/api.ts` at a container built from the new implementation, for example a throwaway database per test file.
 3. Select it in `createContainer()` in `server/container.ts`, for example when `DATABASE_URL` is set. Keep the memory store as the fallback for demos and tests.
-4. Replace the mocked side effects behind the same service methods: the on-screen password reset link, invite links and the mock checkout. API responses keep their shape.
+4. Replace the mocked side effects behind the same service methods: the on-screen password reset link (email it instead; the API already returns `resetUrl: null` outside demo mode), invite links and the mock checkout. API responses keep their shape.
 
 Services, route handlers, schemas, the API client (`lib/api/`) and the UI don't change.
 

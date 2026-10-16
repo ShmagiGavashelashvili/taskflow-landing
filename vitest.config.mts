@@ -21,6 +21,8 @@ export default defineConfig({
           name: "server",
           environment: "node",
           include: SERVER_TESTS,
+          // `vi.stubEnv` (e.g. DEMO_MODE) is undone after every test, like tests/setup.ts does for UI tests.
+          unstubEnvs: true,
         },
       },
       {
