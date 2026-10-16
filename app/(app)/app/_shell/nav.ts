@@ -1,4 +1,4 @@
-import { LayoutDashboard, Settings } from "lucide-react";
+import { FolderKanban, LayoutDashboard, Settings } from "lucide-react";
 import type { NavItem } from "./NavLinks";
 
 /**
@@ -8,5 +8,6 @@ import type { NavItem } from "./NavLinks";
  */
 export const APP_NAV: NavItem[] = [
   { href: "/app", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/app/projects", label: "Projects", icon: FolderKanban, exact: true },
   { href: "/app/settings", label: "Settings", icon: Settings },
 ];

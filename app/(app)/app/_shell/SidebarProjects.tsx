@@ -1,15 +1,34 @@
+import Link from "next/link";
+import { Suspense } from "react";
+import { PROJECTS_PATH } from "@/lib/app-paths";
 import type { AppSession } from "@/server/auth/session";
+import { getContainer } from "@/server/container";
+import { projectService } from "@/server/services/projects";
+import NewProjectButton from "../projects/NewProjectButton";
+import { SidebarProjectLinks, StaticSidebarProjectLinks } from "./SidebarProjectLinks";
 
 /**
- * SLOT (#5): the sidebar's project list. Rendered inside `<Suspense fallback={<SidebarProjectsSkeleton />}>`
- * with the resolved session, so it can call the project service directly. Replace the body
- * with the workspace's active projects (links to `/app/projects/[projectId]`) and a
- * "New project" action.
+ * The sidebar's project list: the workspace's active projects, a link to all projects
+ * (including archived ones) and "New project". Rendered inside
+ * `<Suspense fallback={<SidebarProjectsSkeleton />}>` with the resolved session.
  */
 export default async function SidebarProjects({ session }: { session: AppSession }) {
+  const projects = (await projectService(getContainer()).list(session, { archived: false })).map(({ id, name, color }) => ({
+    id,
+    name,
+    color,
+  }));
+
   return (
     <SidebarSection>
-      <p className="px-2.5 py-1.5 text-sm text-muted-foreground">No projects in {session.workspace.name} yet.</p>
+      {projects.length === 0 ? (
+        <p className="px-2.5 py-1.5 text-sm text-muted-foreground">No active projects yet.</p>
+      ) : (
+        <Suspense fallback={<StaticSidebarProjectLinks projects={projects} />}>
+          <SidebarProjectLinks projects={projects} />
+        </Suspense>
+      )}
+      <NewProjectButton compact />
     </SidebarSection>
   );
 }
@@ -28,9 +47,14 @@ export function SidebarProjectsSkeleton() {
 function SidebarSection({ children }: { children: React.ReactNode }) {
   return (
     <section aria-labelledby="sidebar-projects-heading" className="grid gap-1">
-      <h2 id="sidebar-projects-heading" className="px-2.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-        Projects
-      </h2>
+      <div className="flex items-center justify-between px-2.5">
+        <h2 id="sidebar-projects-heading" className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+          Projects
+        </h2>
+        <Link href={PROJECTS_PATH} className="text-xs font-medium text-muted-foreground hover:text-brand">
+          View all
+        </Link>
+      </div>
       {children}
     </section>
   );
