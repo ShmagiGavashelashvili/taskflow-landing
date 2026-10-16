@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { PROJECTS_PATH } from "@/lib/app-paths";
 import type { AppSession } from "@/server/auth/session";
 import { getContainer } from "@/server/container";
+import { withFallback } from "@/server/render";
 import { projectService } from "@/server/services/projects";
 import NewProjectButton from "../projects/NewProjectButton";
 import { SidebarProjectLinks, StaticSidebarProjectLinks } from "./SidebarProjectLinks";
@@ -13,11 +14,9 @@ import { SidebarProjectLinks, StaticSidebarProjectLinks } from "./SidebarProject
  * `<Suspense fallback={<SidebarProjectsSkeleton />}>` with the resolved session.
  */
 export default async function SidebarProjects({ session }: { session: AppSession }) {
-  const projects = (await projectService(getContainer()).list(session, { archived: false })).map(({ id, name, color }) => ({
-    id,
-    name,
-    color,
-  }));
+  const active = await withFallback(() => projectService(getContainer()).list(session, { archived: false }), null);
+  if (!active) return <SidebarProjectsUnavailable />;
+  const projects = active.map(({ id, name, color }) => ({ id, name, color }));
 
   return (
     <SidebarSection>
@@ -29,6 +28,15 @@ export default async function SidebarProjects({ session }: { session: AppSession
         </Suspense>
       )}
       <NewProjectButton compact />
+    </SidebarSection>
+  );
+}
+
+/** Shown instead of the list when it can't be loaded; the rest of the shell keeps working. */
+export function SidebarProjectsUnavailable() {
+  return (
+    <SidebarSection>
+      <p className="px-2.5 py-1.5 text-sm text-muted-foreground">Couldn&apos;t load projects. Refresh to try again.</p>
     </SidebarSection>
   );
 }

@@ -5,11 +5,12 @@ import { Toaster } from "@/components/ui/sonner";
 import Logo from "@/components/ui/Logo";
 import QueryProvider from "@/context/QueryProvider";
 import { getAppSession } from "@/server/auth/app-session";
+import { withFallback } from "@/server/render";
 import AppBanners from "./_shell/AppBanners";
 import { MainNav, MainNavFallback } from "./_shell/MainNav";
-import SidebarProjects, { SidebarProjectsSkeleton } from "./_shell/SidebarProjects";
+import SidebarProjects, { SidebarProjectsSkeleton, SidebarProjectsUnavailable } from "./_shell/SidebarProjects";
 import TopBarStatus from "./_shell/TopBarStatus";
-import UserMenu, { UserMenuSkeleton } from "./_shell/UserMenu";
+import UserMenu, { UserMenuSkeleton, UserMenuUnavailable } from "./_shell/UserMenu";
 
 export const metadata: Metadata = { title: "TaskFlow", robots: { index: false } };
 
@@ -17,6 +18,8 @@ export const metadata: Metadata = { title: "TaskFlow", robots: { index: false } 
  * The protected app shell. The chrome is static (prerendered); everything that reads the
  * session sits in its own Suspense boundary, so `{children}` never waits on it.
  * proxy.ts redirects logged-out visitors before this renders; getAppSession() catches stale sessions.
+ * Each session-reading piece degrades on its own (`withFallback`) if the store fails, so the page
+ * and its own error state stay reachable; app/(app)/error.tsx catches anything else here.
  */
 export default function AppLayout({ children }: LayoutProps<"/app">) {
   return (
@@ -63,25 +66,29 @@ export default function AppLayout({ children }: LayoutProps<"/app">) {
 }
 
 async function WorkspaceName() {
-  const { workspace } = await getAppSession();
+  const workspace = await withFallback(async () => (await getAppSession()).workspace, null);
+  if (!workspace) return null;
   return (
     <p className="truncate px-2.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">{workspace.name}</p>
   );
 }
 
 async function Projects() {
-  return <SidebarProjects session={await getAppSession()} />;
+  const session = await withFallback(getAppSession, null);
+  return session ? <SidebarProjects session={session} /> : <SidebarProjectsUnavailable />;
 }
 
 async function CurrentUserMenu() {
-  const { user } = await getAppSession();
-  return <UserMenu name={user.name} email={user.email} />;
+  const session = await withFallback(getAppSession, null);
+  return session ? <UserMenu name={session.user.name} email={session.user.email} /> : <UserMenuUnavailable />;
 }
 
 async function Status() {
-  return <TopBarStatus session={await getAppSession()} />;
+  const session = await withFallback(getAppSession, null);
+  return session && <TopBarStatus session={session} />;
 }
 
 async function Banners() {
-  return <AppBanners session={await getAppSession()} />;
+  const session = await withFallback(getAppSession, null);
+  return session && <AppBanners session={session} />;
 }

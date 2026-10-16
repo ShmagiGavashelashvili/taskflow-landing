@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { getAppSession } from "@/server/auth/app-session";
+import { withFallback } from "@/server/render";
 import { NavLinks, StaticNavLinks } from "../_shell/NavLinks";
 import { settingsNavFor } from "./nav";
 
@@ -19,7 +20,9 @@ export default function SettingsLayout({ children }: LayoutProps<"/app/settings"
 }
 
 async function SettingsNav() {
-  const items = settingsNavFor((await getAppSession()).role);
+  // If the session can't be read, show the sections every member sees.
+  const session = await withFallback(getAppSession, null);
+  const items = settingsNavFor(session?.role ?? "member");
   return (
     <Suspense fallback={<StaticNavLinks items={items} label="Settings" />}>
       <NavLinks items={items} label="Settings" />

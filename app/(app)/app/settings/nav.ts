@@ -24,5 +24,5 @@ export const SETTINGS_NAV: SettingsNavItem[] = [
 
 /** The settings sections a role sees. */
 export function settingsNavFor(role: Role): NavItem[] {
-  return SETTINGS_NAV.filter((item) => role === "owner" || !item.ownerOnly).map(({ ownerOnly: _, ...item }) => item);
+  return SETTINGS_NAV.filter((item) => role === "owner" || !item.ownerOnly).map(({ href, label }) => ({ href, label }));
 }

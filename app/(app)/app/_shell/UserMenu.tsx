@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authApi } from "@/lib/api/auth";
-import { LOGIN_PATH } from "@/lib/auth/paths";
+import { LOGIN_PATH, LOGOUT_PATH } from "@/lib/auth/paths";
 import { initialsOf } from "@/lib/people";
 
 interface UserMenuProps {
@@ -82,5 +82,21 @@ export function UserMenuSkeleton() {
         <div className="h-3 w-32 rounded bg-tint" />
       </div>
     </div>
+  );
+}
+
+/**
+ * Shown when the signed-in user can't be loaded. Logging out still works: GET /api/auth/logout
+ * clears the cookie and goes to login without needing the store.
+ */
+export function UserMenuUnavailable() {
+  return (
+    <a
+      href={LOGOUT_PATH}
+      className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-medium text-muted-foreground hover:bg-tint/60 hover:text-ink"
+    >
+      <LogOut className="size-4" aria-hidden="true" />
+      Log out
+    </a>
   );
 }
