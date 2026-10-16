@@ -8,6 +8,7 @@ import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
 import { requireRoom } from "@/server/domain/plan-guards";
 import type { Project } from "@/server/domain/types";
+import { requireOwner } from "./workspace";
 
 /** Projects in the signed-in user's workspace. Any member can create and edit; only owners delete. */
 export function projectService(container: Container) {
@@ -63,7 +64,7 @@ export function projectService(container: Container) {
     /** Owner only. Deletes the project's tasks and their comments too. */
     async delete(session: AppSession, projectId: string): Promise<void> {
       const project = await this.get(session, projectId);
-      if (session.role !== "owner") throw new DomainError("FORBIDDEN", "Only workspace owners can delete projects.");
+      requireOwner(session, "delete projects");
       const tasks = await container.tasks.list({ projectIds: [project.id] });
       await container.comments.deleteByTasks(tasks.map((task) => task.id));
       await container.tasks.deleteByProject(project.id);
