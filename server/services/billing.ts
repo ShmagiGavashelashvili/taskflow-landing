@@ -14,8 +14,8 @@ import { trialDaysLeft } from "@/lib/trial";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
+import { isPending } from "@/server/domain/invites";
 import type { BillingPeriod, Invoice, PlanId, Workspace } from "@/server/domain/types";
-import { isPending } from "@/server/services/invites";
 import { requireOwner } from "@/server/services/workspace";
 
 type ChangePlanInput = z.output<typeof changePlanRequestSchema>;

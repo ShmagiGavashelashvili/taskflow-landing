@@ -12,16 +12,12 @@ import { hashPassword, verifyPassword } from "@/server/auth/password";
 import { toPublicUser, type AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
+import { isPending } from "@/server/domain/invites";
 import { requireRoom } from "@/server/domain/plan-guards";
 import type { Invite } from "@/server/domain/types";
 import { requireOwner } from "./workspace";
 
 const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-
-/** Not accepted, revoked or expired. */
-export function isPending(invite: Invite, now: Date): boolean {
-  return !invite.acceptedAt && !invite.revokedAt && new Date(invite.expiresAt) > now;
-}
 
 /** The path an invitee opens; shown to the owner because the prototype sends no email. */
 export const inviteUrl = (token: string) => `/invite/${token}`;
@@ -32,7 +28,7 @@ function toPendingInvite(invite: Invite): PendingInvite {
 }
 
 /** The member-limit message for a workspace whose effective plan caps members. */
-export function memberLimitMessage(limit: number | null): string {
+function memberLimitMessage(limit: number | null): string {
   return `Your plan allows up to ${limit} members, including pending invites. Upgrade to Pro for unlimited members.`;
 }
 
