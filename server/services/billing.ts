@@ -63,12 +63,6 @@ function chargeCard(payment: ChangePlanInput["payment"]): void {
 
 /** Mock billing for the signed-in owner's workspace: subscription, plan changes, invoices. */
 export function billingService(container: Container) {
-  async function load(session: AppSession): Promise<Workspace> {
-    const workspace = await container.workspaces.findById(session.workspace.id);
-    if (!workspace) throw new DomainError("UNAUTHENTICATED", "Please log in to continue.");
-    return workspace;
-  }
-
   /** Counts active projects straight from the projects repository. */
   async function usage(workspaceId: string, now: Date): Promise<Subscription["usage"]> {
     const [memberships, invites, activeProjects] = await Promise.all([
@@ -102,7 +96,7 @@ export function billingService(container: Container) {
   return {
     async get(session: AppSession): Promise<BillingResponse> {
       requireOwner(session, "manage billing");
-      return { subscription: await subscription(await load(session)), plans: PLAN_OFFERS };
+      return { subscription: await subscription(session.workspace), plans: PLAN_OFFERS };
     },
 
     /**
@@ -112,7 +106,7 @@ export function billingService(container: Container) {
      */
     async changePlan(session: AppSession, request: ChangePlanInput): Promise<ChangePlanResponse> {
       requireOwner(session, "manage billing");
-      const workspace = await load(session);
+      const { workspace } = session;
       const now = container.clock.now();
       const { plan, billingPeriod } = request;
 

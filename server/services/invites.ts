@@ -13,7 +13,7 @@ import { toPublicUser, type AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
 import { requireRoom } from "@/server/domain/plan-guards";
-import type { Invite, Workspace } from "@/server/domain/types";
+import type { Invite } from "@/server/domain/types";
 import { requireOwner } from "./workspace";
 
 const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -53,12 +53,6 @@ function assertUsable(invite: Invite | null, now: Date): asserts invite is Invit
 export function inviteService(container: Container) {
   const now = () => container.clock.now();
 
-  async function loadWorkspace(session: AppSession): Promise<Workspace> {
-    const workspace = await container.workspaces.findById(session.workspace.id);
-    if (!workspace) throw new DomainError("UNAUTHENTICATED", "Please log in to continue.");
-    return workspace;
-  }
-
   async function pending(workspaceId: string): Promise<Invite[]> {
     const at = now();
     return (await container.invites.listByWorkspace(workspaceId)).filter((invite) => isPending(invite, at));
@@ -72,7 +66,7 @@ export function inviteService(container: Container) {
 
     async create(session: AppSession, { email }: z.output<typeof createInviteRequestSchema>): Promise<PendingInvite> {
       requireOwner(session, "invite people");
-      const workspace = await loadWorkspace(session);
+      const { workspace } = session;
 
       const existingUser = await container.users.findByEmail(email);
       if (existingUser && (await container.memberships.find(existingUser.id, workspace.id))) {

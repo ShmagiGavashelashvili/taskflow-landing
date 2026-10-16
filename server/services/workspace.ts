@@ -14,14 +14,11 @@ export function requireOwner(session: AppSession, action: string): void {
 
 /** The signed-in user's workspace: details and members. */
 export function workspaceService(container: Container) {
-  async function load(session: AppSession): Promise<Workspace> {
-    const workspace = await container.workspaces.findById(session.workspace.id);
-    if (!workspace) throw new DomainError("UNAUTHENTICATED", "Please log in to continue.");
-    return workspace;
-  }
-
   return {
-    get: load,
+    /** The session already carries the workspace, read fresh when the session was resolved. */
+    async get(session: AppSession): Promise<Workspace> {
+      return session.workspace;
+    },
 
     async update(session: AppSession, patch: z.output<typeof updateWorkspaceRequestSchema>): Promise<Workspace> {
       requireOwner(session, "rename the workspace");
@@ -31,7 +28,7 @@ export function workspaceService(container: Container) {
     },
 
     async listMembers(session: AppSession): Promise<MembersResponse> {
-      const workspace = await load(session);
+      const { workspace } = session;
       const memberships = await container.memberships.listByWorkspace(workspace.id);
       const users = new Map((await container.users.findByIds(memberships.map((m) => m.userId))).map((u) => [u.id, u]));
       const members: Member[] = memberships.flatMap((membership) => {

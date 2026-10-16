@@ -5,19 +5,14 @@ import { hashPassword, verifyPassword } from "@/server/auth/password";
 import { toPublicUser, type AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
-import type { User, UserRecord } from "@/server/domain/types";
+import type { User } from "@/server/domain/types";
 
 /** The signed-in user's own account: profile and password. */
 export function meService(container: Container) {
-  async function load(session: AppSession): Promise<UserRecord> {
-    const user = await container.users.findById(session.user.id);
-    if (!user) throw new DomainError("UNAUTHENTICATED", "Please log in to continue.");
-    return user;
-  }
-
   return {
+    /** The session already carries the user, read fresh when the session was resolved. */
     async getProfile(session: AppSession): Promise<User> {
-      return toPublicUser(await load(session));
+      return session.user;
     },
 
     async updateProfile(session: AppSession, patch: z.output<typeof updateProfileRequestSchema>): Promise<User> {
@@ -27,7 +22,9 @@ export function meService(container: Container) {
     },
 
     async changePassword(session: AppSession, input: z.output<typeof changePasswordRequestSchema>): Promise<void> {
-      const user = await load(session);
+      // A fresh read: the session's user is public and has no password hash.
+      const user = await container.users.findById(session.user.id);
+      if (!user) throw new DomainError("UNAUTHENTICATED", "Please log in to continue.");
       if (!(await verifyPassword(input.currentPassword, user.passwordHash))) {
         throw new DomainError("VALIDATION_ERROR", "Your current password is incorrect.", {
           currentPassword: ["Your current password is incorrect."],
