@@ -2,7 +2,7 @@ import "server-only";
 import type { NextRequest, NextResponse } from "next/server";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
-import type { Membership, Role, User, UserRecord, Workspace } from "@/server/domain/types";
+import type { Role, User, UserRecord, Workspace } from "@/server/domain/types";
 import { readSessionToken, SESSION_COOKIE, sessionCookieOptions, signSessionToken } from "./token";
 
 /**
@@ -58,9 +58,9 @@ export async function requireSession(request: NextRequest, container: Container)
   return session;
 }
 
-/** Logs a user into a workspace by setting the session cookie on `response`. */
-export async function startSession(response: NextResponse, membership: Pick<Membership, "userId" | "workspaceId">) {
-  const token = await signSessionToken({ userId: membership.userId, workspaceId: membership.workspaceId });
+/** Logs the session's user into its workspace by setting the session cookie on `response`. */
+export async function startSession(response: NextResponse, session: AppSession) {
+  const token = await signSessionToken({ userId: session.user.id, workspaceId: session.workspace.id });
   response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
   return response;
 }

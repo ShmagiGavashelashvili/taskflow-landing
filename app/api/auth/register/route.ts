@@ -7,8 +7,5 @@ import { authService } from "@/server/services/auth";
 export const POST = route(async (request, { container }) => {
   const input = await parseBody(request, registerRequestSchema);
   const session = await authService(container).register(input);
-  return startSession(json<SessionResponse>(session, { status: 201 }), {
-    userId: session.user.id,
-    workspaceId: session.workspace.id,
-  });
+  return startSession(json<SessionResponse>(session, { status: 201 }), session);
 });

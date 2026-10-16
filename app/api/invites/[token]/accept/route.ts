@@ -8,5 +8,5 @@ import { inviteService } from "@/server/services/invites";
 export const POST = route<{ token: string }>(async (request, { params, container }) => {
   const input = await parseBody(request, acceptInviteRequestSchema);
   const session = await inviteService(container).accept(params.token, input);
-  return startSession(json<SessionResponse>(session), { userId: session.user.id, workspaceId: session.workspace.id });
+  return startSession(json<SessionResponse>(session), session);
 });
