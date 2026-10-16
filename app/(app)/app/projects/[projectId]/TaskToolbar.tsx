@@ -9,7 +9,7 @@ import { TASK_PRIORITIES } from "@/lib/schemas/entities";
 import { UNASSIGNED, type TaskFilters } from "@/lib/schemas/tasks";
 import { PRIORITY_LABELS } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
-import type { Member } from "./types";
+import type { Assignee } from "./types";
 
 export type ProjectViewMode = "board" | "list";
 
@@ -18,7 +18,7 @@ interface TaskToolbarProps {
   onViewChange: (view: ProjectViewMode) => void;
   filters: TaskFilters;
   onFiltersChange: (filters: TaskFilters) => void;
-  members: readonly Member[];
+  members: readonly Assignee[];
 }
 
 const ALL = "all";

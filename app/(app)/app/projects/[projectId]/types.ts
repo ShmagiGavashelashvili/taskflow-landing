@@ -1,4 +1,7 @@
-import type { User } from "@/lib/schemas/entities";
+import type { Person } from "@/lib/schemas/comments";
 
-/** A workspace member as the project views need them: assignee names, avatars and filters. */
-export type Member = Pick<User, "id" | "name">;
+/**
+ * Someone a task can be assigned to, as the project views need them: names, avatars and
+ * filters. What `taskService.assignees` returns. Not the members-settings `Member` (which has a role).
+ */
+export type Assignee = Person;

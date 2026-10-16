@@ -28,12 +28,12 @@ import { cn } from "@/lib/utils";
 import QuickAdd from "./QuickAdd";
 import TaskCard from "./TaskCard";
 import { TasksLoadError } from "./TaskMeta";
-import type { Member } from "./types";
+import type { Assignee } from "./types";
 
 interface BoardProps {
   projectId: string;
   filters: TaskFilters;
-  members: readonly Member[];
+  members: readonly Assignee[];
   /** `YYYY-MM-DD`, for overdue highlighting. */
   today: string;
 }
@@ -178,7 +178,7 @@ function SortableCard({
 }: {
   task: BoardTask;
   index: number;
-  assignee: Member | undefined;
+  assignee: Assignee | undefined;
   today: string;
 }) {
   const { setNodeRef, setActivatorNodeRef, listeners, attributes, transform, transition, isDragging } = useSortable({

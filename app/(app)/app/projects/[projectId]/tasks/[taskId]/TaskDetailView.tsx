@@ -19,13 +19,13 @@ import { TASK_PRIORITIES, TASK_STATUSES, type TaskPriority, type TaskStatus } fr
 import type { TaskDetail } from "@/lib/schemas/tasks";
 import { isOverdue, PRIORITY_LABELS, STATUS_LABELS } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
-import type { Member } from "../../types";
+import type { Assignee } from "../../types";
 import CommentThread from "./CommentThread";
 
 interface TaskDetailViewProps {
   taskId: string;
   project: { id: string; name: string };
-  members: readonly Member[];
+  members: readonly Assignee[];
   currentUser: Person;
   /** `YYYY-MM-DD` from the server clock, so overdue highlighting matches the board. */
   today: string;
@@ -197,7 +197,7 @@ function InlineField({ label, value, maxLength, required = false, onSave, render
 }
 
 /** Status, assignee, priority, due date and the created/updated metadata. */
-function TaskSidebar({ task, members, today }: { task: TaskDetail; members: readonly Member[]; today: string }) {
+function TaskSidebar({ task, members, today }: { task: TaskDetail; members: readonly Assignee[]; today: string }) {
   const update = useUpdateTask(task.id);
   const overdue = isOverdue(task, today);
   // Someone removed from the workspace can still be the creator; assignees are always members.

@@ -6,7 +6,7 @@ import type { BoardTask } from "@/lib/schemas/tasks";
 import { avatarToneOf, initialsOf } from "@/lib/people";
 import { isOverdue, PRIORITY_LABELS } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
-import type { Member } from "./types";
+import type { Assignee } from "./types";
 
 /** Small pieces of task metadata shared by the board card and the list view. */
 
@@ -49,7 +49,7 @@ export function CommentCount({ count }: { count: number }) {
   );
 }
 
-export function Assignee({ member, showName = false }: { member: Member | undefined; showName?: boolean }) {
+export function AssigneeBadge({ member, showName = false }: { member: Assignee | undefined; showName?: boolean }) {
   if (!member) return showName ? <span className="text-sm text-muted-foreground">Unassigned</span> : null;
   return (
     <span className="inline-flex min-w-0 items-center gap-1.5" title={member.name}>

@@ -7,13 +7,13 @@ import { taskPath } from "@/lib/app-paths";
 import { taskQueries } from "@/lib/api/tasks";
 import type { TaskFilters } from "@/lib/schemas/tasks";
 import { STATUS_LABELS } from "@/lib/tasks";
-import { Assignee, CommentCount, DueDate, PriorityBadge, TasksLoadError } from "./TaskMeta";
-import type { Member } from "./types";
+import { AssigneeBadge, CommentCount, DueDate, PriorityBadge, TasksLoadError } from "./TaskMeta";
+import type { Assignee } from "./types";
 
 interface TaskListProps {
   projectId: string;
   filters: TaskFilters;
-  members: readonly Member[];
+  members: readonly Assignee[];
   today: string;
 }
 
@@ -55,7 +55,7 @@ export default function TaskList({ projectId, filters, members, today }: TaskLis
               </td>
               <td className="px-4 py-2.5 whitespace-nowrap text-muted-foreground">{STATUS_LABELS[task.status]}</td>
               <td className="max-w-48 px-4 py-2.5">
-                <Assignee member={task.assigneeId ? membersById.get(task.assigneeId) : undefined} showName />
+                <AssigneeBadge member={task.assigneeId ? membersById.get(task.assigneeId) : undefined} showName />
               </td>
               <td className="px-4 py-2.5"><PriorityBadge priority={task.priority} /></td>
               <td className="px-4 py-2.5 whitespace-nowrap"><DueDate task={task} today={today} /></td>

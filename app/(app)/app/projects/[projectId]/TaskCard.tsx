@@ -4,12 +4,12 @@ import type { ButtonHTMLAttributes, Ref } from "react";
 import { taskPath } from "@/lib/app-paths";
 import type { BoardTask } from "@/lib/schemas/tasks";
 import { cn } from "@/lib/utils";
-import { Assignee, CommentCount, DueDate, PriorityBadge } from "./TaskMeta";
-import type { Member } from "./types";
+import { AssigneeBadge, CommentCount, DueDate, PriorityBadge } from "./TaskMeta";
+import type { Assignee } from "./types";
 
 interface TaskCardProps {
   task: BoardTask;
-  assignee: Member | undefined;
+  assignee: Assignee | undefined;
   today: string;
   /** Props for the drag handle (dnd-kit's activator); omitted for the drag overlay. */
   handle?: ButtonHTMLAttributes<HTMLButtonElement> & { ref?: Ref<HTMLButtonElement> };
@@ -49,7 +49,7 @@ export default function TaskCard({ task, assignee, today, handle, dragging, over
         <DueDate task={task} today={today} />
         <CommentCount count={task.commentCount} />
         <span className="ml-auto">
-          <Assignee member={assignee} />
+          <AssigneeBadge member={assignee} />
         </span>
       </div>
     </div>

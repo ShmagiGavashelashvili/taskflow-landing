@@ -7,11 +7,11 @@ import Board from "./Board";
 import ProjectHeader from "./ProjectHeader";
 import TaskList from "./TaskList";
 import TaskToolbar, { type ProjectViewMode } from "./TaskToolbar";
-import type { Member } from "./types";
+import type { Assignee } from "./types";
 
 interface ProjectViewProps {
   project: Project;
-  members: Member[];
+  members: Assignee[];
   canDelete: boolean;
   /** Today (`YYYY-MM-DD`, server clock) for overdue highlighting, so server and client agree. */
   today: string;
