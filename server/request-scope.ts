@@ -10,7 +10,10 @@ import { cache } from "react";
  * - Server renders: React's `cache` gives one scope per render.
  * - Anywhere else (scripts, tests calling repositories directly) every call gets a new scope.
  */
-const storage = new AsyncLocalStorage<object>();
+// On globalThis, because Next bundles this module separately for pages and route handlers while
+// the container that reads the scope is shared per process (see server/container.ts).
+const globalForScope = globalThis as typeof globalThis & { __taskflowRequestScope?: AsyncLocalStorage<object> };
+const storage = (globalForScope.__taskflowRequestScope ??= new AsyncLocalStorage<object>());
 const renderScope = cache((): object => ({}));
 
 export function runInRequestScope<T>(fn: () => T): T {
