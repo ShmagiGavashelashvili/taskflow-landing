@@ -1,11 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { MouseEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { registerUrl } from "@/lib/auth/paths";
 import EmailCapture from "./EmailCapture";
 
-/** The field and the link find each other through these, so they stay private to this module. */
 const FIELD_ID = "hero-email";
 const ANCHOR_ID = "get-started";
 
@@ -16,8 +15,8 @@ interface SignupFieldProps {
 }
 
 /**
- * The main email signup form: a valid email goes to registration, pre-filled.
- * Every SignupLink on the page scrolls to and focuses it.
+ * The main email signup form: a valid email goes to registration, pre-filled. Its wrapper is
+ * the `#get-started` anchor that in-page links point at.
  */
 export function SignupField({ className = "", children }: SignupFieldProps) {
   const router = useRouter();
@@ -31,30 +30,5 @@ export function SignupField({ className = "", children }: SignupFieldProps) {
       />
       {children}
     </div>
-  );
-}
-
-interface SignupLinkProps {
-  children: ReactNode;
-  className?: string;
-  /** Called when the link is activated, e.g. to close a menu. */
-  onNavigate?: () => void;
-}
-
-/** Scrolls to the signup field and focuses it. Falls back to the anchor if the field is missing. */
-export function SignupLink({ children, className, onNavigate }: SignupLinkProps) {
-  function handleClick(event: MouseEvent<HTMLAnchorElement>) {
-    onNavigate?.();
-    const input = document.getElementById(FIELD_ID);
-    if (!input) return;
-    event.preventDefault();
-    input.scrollIntoView({ block: "center" });
-    input.focus({ preventScroll: true });
-  }
-
-  return (
-    <a href={`#${ANCHOR_ID}`} onClick={handleClick} className={className}>
-      {children}
-    </a>
   );
 }

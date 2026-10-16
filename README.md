@@ -29,7 +29,7 @@ To reset local data to the seed, stop the dev server and delete `.data/db.json`.
 
 ### App map
 
-- `/`: the landing page. Start Free Trial and the hero email field go to registration, with the email pre-filled. Pricing buttons pre-select their plan. Log in becomes Go to app once you're signed in.
+- `/`: the landing page. Start Free Trial goes to registration, and the hero email field goes there with the email pre-filled. Pricing buttons pre-select their plan. Log in becomes Go to app once you're signed in.
 - `/register`, `/login`, `/forgot-password`, `/reset-password`: authentication. No email is sent, so in demo mode the password reset link is shown on screen. Outside demo mode the forgot-password response is the same whether or not the email has an account, and the link isn't returned; a real implementation emails it.
 - `/app`: the signed-in app (dashboard, projects with board and list views, task details, timeline, and settings for profile, workspace, members, billing, integrations and automations). Logged-out visitors are sent to login and then returned to the page they asked for.
 - `/invite/<token>`: invite acceptance. Owners get a copyable invite link instead of an email.
