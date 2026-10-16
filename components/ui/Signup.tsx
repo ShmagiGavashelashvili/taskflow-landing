@@ -1,6 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import type { MouseEvent, ReactNode } from "react";
+import { registerUrl } from "@/lib/auth/paths";
 import EmailCapture from "./EmailCapture";
 
 /** The field and the link find each other through these, so they stay private to this module. */
@@ -13,16 +15,19 @@ interface SignupFieldProps {
   children?: ReactNode;
 }
 
-/** The main email signup form. Every SignupLink on the page scrolls to and focuses it. */
+/**
+ * The main email signup form: a valid email goes to registration, pre-filled.
+ * Every SignupLink on the page scrolls to and focuses it.
+ */
 export function SignupField({ className = "", children }: SignupFieldProps) {
+  const router = useRouter();
   return (
     <div id={ANCHOR_ID} className={className}>
       <EmailCapture
         inputId={FIELD_ID}
         label="Work email"
         buttonLabel="Get Started Free"
-        successTitle="You're on the list!"
-        successMessage="This is a demo, so nothing was sent. In a real app we'd email you a sign-in link."
+        onValidEmail={(email) => router.push(registerUrl({ email }))}
       />
       {children}
     </div>

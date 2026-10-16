@@ -106,6 +106,18 @@ describe("useEmailForm", () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
+  it("hands a valid, trimmed email to onValidEmail instead of simulating a submit", () => {
+    const onValidEmail = vi.fn();
+    const { result } = renderHook(() => useEmailForm({ onValidEmail }));
+    act(() => result.current.onSubmit(submitEvent()));
+    expect(onValidEmail).not.toHaveBeenCalled();
+    act(() => result.current.onChange(changeEvent("  jane@example.com ")));
+    act(() => result.current.onSubmit(submitEvent()));
+    expect(onValidEmail).toHaveBeenCalledExactlyOnceWith("jane@example.com");
+    expect(result.current.status).toBe("idle");
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
   it("resets to the initial state", () => {
     const { result } = renderHook(() => useEmailForm());
     act(() => result.current.onChange(changeEvent("jane@example.com")));

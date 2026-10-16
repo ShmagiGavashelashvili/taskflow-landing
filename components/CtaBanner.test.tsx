@@ -1,7 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { SignupField } from "./ui/Signup";
 import CtaBanner from "./CtaBanner";
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 describe("CtaBanner", () => {
   it("renders the headline and supporting copy", () => {

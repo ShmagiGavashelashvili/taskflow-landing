@@ -3,39 +3,85 @@
 [![Test](https://github.com/ShmagiGavashelashvili/taskflow-landing/actions/workflows/test.yml/badge.svg)](https://github.com/ShmagiGavashelashvili/taskflow-landing/actions/workflows/test.yml)
 ![Coverage](https://raw.githubusercontent.com/ShmagiGavashelashvili/taskflow-landing/badges/coverage.svg)
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+TaskFlow is a project management app for small teams. This repo has the marketing landing page at `/` and a working app prototype behind it. In the prototype you can register, log in, manage workspaces and members, work on project boards and lists, open task details with comments, and use a dashboard, a timeline, billing, integrations and automations.
 
-## Getting Started
+There's no database or third-party service yet. All data comes from a seeded in-memory mock store behind repository interfaces, so a real backend can replace it without touching the API or the UI (see [Replacing the mocks](#replacing-the-mocks)).
 
-First, run the development server:
+Built with Next.js 16 (App Router, Cache Components), React 19, Tailwind CSS 4, shadcn/ui, TanStack Query and zod.
+
+## Running the prototype
+
+You need Node.js 20.9 or later.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server. Mock data is saved to `.data/db.json` so it survives restarts. |
+| `npm run build` then `npm start` | Production build and server. `npm start` needs `SESSION_SECRET` (see below). |
+| `npm test` | All tests (Vitest). `npm run test:coverage` adds coverage. |
+| `npm run lint` | ESLint. |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To reset local data to the seed, stop the dev server and delete `.data/db.json`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### App map
 
-## Learn More
+- `/`: the landing page. Start Free Trial and the hero email field go to registration, with the email pre-filled. Pricing buttons pre-select their plan. Log in becomes Go to app once you're signed in.
+- `/register`, `/login`, `/forgot-password`, `/reset-password`: authentication. No email is sent, so the password reset link is shown on screen.
+- `/app`: the signed-in app (dashboard, projects with board and list views, task details, timeline, and settings for profile, workspace, members, billing, integrations and automations). Logged-out visitors are sent to login and then returned to the page they asked for.
+- `/invite/<token>`: invite acceptance. Owners get a copyable invite link instead of an email.
 
-To learn more about Next.js, take a look at the following resources:
+## Demo credentials
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The seed creates the workspace **Acme Studio** on the paid Pro plan, with three projects, tasks (some of them overdue), comments, invoices and connected integrations.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Email | Password | Role |
+|---|---|---|
+| `demo@taskflow.app` | `demo1234` | Owner (Alex Morgan) |
+| `priya@acme.studio` | `demo1234` | Member |
+| `marcus@acme.studio` | `demo1234` | Member |
+| `lena@acme.studio` | `demo1234` | Member |
+| `tom@acme.studio` | `demo1234` | Member |
+
+In demo mode the login page shows the owner credentials, and the app shows a "Demo environment: data may reset" badge. New accounts you register start a 14-day trial of the plan you picked (Pro by default). The mock checkout is pre-filled with a test card.
+
+On Vercel the mock store lives in memory on each server instance. It can reset to the seed at any time, so registered accounts and edits may disappear. The demo accounts always work.
+
+## Environment variables
+
+All of them are optional in development. They're read in `server/config.ts`, except `NEXT_PUBLIC_SITE_URL` (`constants/site.ts`).
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `SESSION_SECRET` | Fixed dev-only key | Signs the session cookie (HS256). **Required in production**, including `npm start` and Vercel previews. Generate one with `openssl rand -base64 32`. |
+| `DEMO_MODE` | On | Set to `false` to hide the demo badge and the credential hint on the login page. |
+| `MOCK_LATENCY_MS` | `300` (`0` in tests) | Simulated delay for each mock store call, so loading states are visible. |
+| `MOCK_FAILURE_RATE` | `0` | Probability (0 to 1) that a mock store call fails with `UNAVAILABLE`, to exercise error states. |
+| `NEXT_PUBLIC_SITE_URL` | Vercel production URL, else `http://localhost:3000` | Canonical URL for metadata, the sitemap and robots.txt. |
+
+For example, `MOCK_LATENCY_MS=1500 MOCK_FAILURE_RATE=0.2 npm run dev` gives you slow and flaky data.
+
+## Replacing the mocks
+
+The full decision is in [ADR 0002](docs/adr/0002-mock-data-behind-repositories.md). In short, requests flow through these layers:
+
+1. Route handlers (`app/api/**/route.ts`): the HTTP contract, validated with the zod schemas in `lib/schemas/`.
+2. Services (`server/services/`): business rules, permissions and plan limits.
+3. Repository interfaces (`server/repositories/types.ts`): one per entity.
+4. Implementations: today only the seeded memory store in `server/repositories/memory/`.
+
+`server/container.ts` is the only place that picks an implementation. To move to a real database or backend:
+
+1. Implement every interface in `server/repositories/types.ts`, for example in `server/repositories/postgres/`. Follow the conventions at the top of that file: async methods, return copies, no cascading deletes.
+2. Make the API test suite pass against it. Point `setupTestContainer` in `tests/api.ts` at a container built from the new implementation, for example a throwaway database per test file.
+3. Select it in `createContainer()` in `server/container.ts`, for example when `DATABASE_URL` is set. Keep the memory store as the fallback for demos and tests.
+4. Replace the mocked side effects behind the same service methods: the on-screen password reset link, invite links and the mock checkout. API responses keep their shape.
+
+Services, route handlers, schemas, the API client (`lib/api/`) and the UI don't change.
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Import the repo into [Vercel](https://vercel.com/new) and set `SESSION_SECRET` for the Production and Preview environments. Data stays mocked and per instance, as described above.
