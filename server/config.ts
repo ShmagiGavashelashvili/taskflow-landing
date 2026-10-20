@@ -50,6 +50,11 @@ export function mockFailureRate(): number {
   return Math.min(1, readNumber("MOCK_FAILURE_RATE", 0));
 }
 
+/** Postgres connection string (the pooled one the Neon integration provides); unset means the in-memory store. */
+export function databaseConnectionString(): string | null {
+  return process.env.DATABASE_URL?.trim() || null;
+}
+
 /** Where the dev server keeps the mock store between restarts; none on Vercel, in builds or tests. */
 export function mockPersistPath(): string | null {
   if (process.env.NODE_ENV !== "development" || process.env.VERCEL) return null;

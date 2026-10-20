@@ -1,10 +1,12 @@
 import "server-only";
-import { mockFailureRate, mockLatencyMs, mockPersistPath } from "@/server/config";
+import { databaseConnectionString, mockFailureRate, mockLatencyMs, mockPersistPath } from "@/server/config";
 import { createMemoryRepositories } from "@/server/repositories/memory/repositories";
 import { withSimulatedNetwork } from "@/server/repositories/memory/simulate";
 import { MemoryStore } from "@/server/repositories/memory/store";
 import type { Repositories } from "@/server/repositories/types";
 import { createSeedData } from "@/server/seed";
+import { Database } from "@/server/repositories/postgres/database";
+import { createPostgresRepositories } from "@/server/repositories/postgres/repositories";
 
 /** Source of the current time. Services must use this instead of `new Date()` so tests can pin it. */
 export interface Clock {
@@ -14,7 +16,7 @@ export interface Clock {
 export interface Container extends Repositories {
   clock: Clock;
   /** Which implementation backs the repositories; reported by `/api/meta`. */
-  dataSource: "memory";
+  dataSource: "memory" | "postgres";
 }
 
 export interface MemoryContainerOptions {
@@ -35,12 +37,21 @@ export function createMemoryContainer(options: MemoryContainerOptions = {}): Con
   return { ...repositories, clock, dataSource: "memory" };
 }
 
+/** A container backed by Postgres. The schema and the demo seed are created on first use. */
+export function createPostgresContainer(connectionString: string, now?: Date): Container {
+  const clock: Clock = now ? { now: () => new Date(now) } : { now: () => new Date() };
+  const database = new Database(connectionString, () => createSeedData(clock.now()));
+  return { ...createPostgresRepositories(database), clock, dataSource: "postgres" };
+}
+
 /**
- * THE swap point. Chooses the repository implementations for the running environment.
- * Today that's always the seeded in-memory store; a database would be selected here (for
- * example when `DATABASE_URL` is set) without touching services, handlers, client or UI.
+ * THE swap point. Chooses the repository implementations for the running environment:
+ * Postgres when `DATABASE_URL` is set (Vercel production and previews), otherwise the seeded
+ * in-memory store (local development and tests), without touching services, handlers, client or UI.
  */
 function createContainer(): Container {
+  const databaseUrl = databaseConnectionString();
+  if (databaseUrl) return createPostgresContainer(databaseUrl);
   return createMemoryContainer({
     latencyMs: mockLatencyMs(),
     failureRate: mockFailureRate(),

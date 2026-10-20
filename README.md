@@ -48,7 +48,7 @@ The seed creates the workspace **Acme Studio** on the paid Pro plan, with three 
 
 Demo mode is on by default in development and on Vercel previews (see `DEMO_MODE` below). In demo mode the login page shows the owner credentials, and the app shows a "Demo environment: data may reset" badge. New accounts you register start a 14-day trial of the plan you picked (Pro by default). The mock checkout is pre-filled with a test card.
 
-On Vercel the mock store lives in memory on each server instance. It can reset to the seed at any time, so registered accounts and edits may disappear. The demo accounts always work.
+With `DATABASE_URL` set (Vercel production and previews, via the Neon integration) data lives in Postgres: the schema is created and the demo workspace seeded on the first request, and registered accounts and edits persist. Without it (local development, tests) the app uses the seeded in-memory store, which resets on restart.
 
 ## Environment variables
 
@@ -56,6 +56,7 @@ All of them are optional in development. They're read in `server/config.ts`, exc
 
 | Variable | Default | Purpose |
 |---|---|---|
+| `DATABASE_URL` | Unset: in-memory store | Postgres connection string (pooled). Provisioned and set by the Vercel Marketplace Neon integration; pull it locally with `vercel env pull` to run against the database. |
 | `SESSION_SECRET` | Fixed dev-only key | Signs the session cookie (HS256). **Required in production**, including `npm start` and Vercel previews. Generate one with `openssl rand -base64 32`. |
 | `DEMO_MODE` | On in development and Vercel previews, off in Vercel production and `npm start` | `true` or `false` overrides the default. Demo mode shows the demo badge, the credential hint on the login page and the on-screen password reset link. The seeded demo accounts work either way. |
 | `MOCK_LATENCY_MS` | `300` in development and Vercel previews, `0` in production and tests | Simulated delay, added once per API request or page render (on its first mock store call), so loading states are visible. |
@@ -84,4 +85,4 @@ Services, route handlers, schemas, the API client (`lib/api/`) and the UI don't 
 
 ## Deploy on Vercel
 
-Import the repo into [Vercel](https://vercel.com/new) and set `SESSION_SECRET` for the Production and Preview environments. Data stays mocked and per instance, as described above.
+Import the repo into [Vercel](https://vercel.com/new) and set `SESSION_SECRET` for the Production and Preview environments. Add the Neon integration from the Marketplace (`vercel integration add neon`) so `DATABASE_URL` is set; without it each server instance keeps its own in-memory data and sign-ups won't survive.
