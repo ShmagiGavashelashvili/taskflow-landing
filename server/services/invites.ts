@@ -14,7 +14,7 @@ import { DomainError } from "@/server/domain/errors";
 import { assertUsable, decideAcceptance, invalidInvite, isPending } from "@/server/domain/invites";
 import { workspaceCapacity } from "@/server/domain/capacity";
 import type { Invite } from "@/server/domain/types";
-import { requireOwner } from "./workspace";
+import { requireOwner } from "@/server/domain/access";
 
 const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 

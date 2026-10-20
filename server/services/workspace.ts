@@ -4,14 +4,10 @@ import { effectivePlan, planLimits } from "@/lib/plans";
 import type { Member, MembersResponse, updateWorkspaceRequestSchema } from "@/lib/schemas/workspace";
 import { toPublicUser, type AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
+import { requireOwner } from "@/server/domain/access";
 import { DomainError } from "@/server/domain/errors";
 import type { Workspace } from "@/server/domain/types";
 import { withUsers } from "./people";
-
-/** Throws FORBIDDEN unless the session's user owns the workspace. */
-export function requireOwner(session: AppSession, action: string): void {
-  if (session.role !== "owner") throw new DomainError("FORBIDDEN", `Only workspace owners can ${action}.`);
-}
 
 /** The signed-in user's workspace: details and members. */
 export function workspaceService(container: Container) {

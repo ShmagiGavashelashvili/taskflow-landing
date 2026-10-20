@@ -16,7 +16,7 @@ import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
 import { workspaceCapacity } from "@/server/domain/capacity";
 import type { BillingPeriod, Invoice, PlanId, Workspace } from "@/server/domain/types";
-import { requireOwner } from "@/server/services/workspace";
+import { requireOwner } from "@/server/domain/access";
 
 type ChangePlanInput = z.output<typeof changePlanRequestSchema>;
 

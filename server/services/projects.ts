@@ -8,7 +8,7 @@ import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
 import { workspaceCapacity } from "@/server/domain/capacity";
 import type { Project } from "@/server/domain/types";
-import { requireOwner } from "./workspace";
+import { requireOwner } from "@/server/domain/access";
 
 /** A project as reports and the timeline label it. */
 export const toProjectRef = ({ id, name, color }: Project): ProjectRef => ({ id, name, color });
