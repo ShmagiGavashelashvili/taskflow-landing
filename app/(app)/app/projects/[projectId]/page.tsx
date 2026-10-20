@@ -10,8 +10,9 @@ import { DomainError } from "@/server/domain/errors";
 import { projectService } from "@/server/services/projects";
 import { taskService } from "@/server/services/tasks";
 import ProjectView from "./ProjectView";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Project · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Project") };
 
 /**
  * A project's board and list. The first load reads through the services on the server and

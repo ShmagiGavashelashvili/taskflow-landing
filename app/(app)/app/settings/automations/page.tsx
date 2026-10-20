@@ -5,8 +5,9 @@ import { getContainer } from "@/server/container";
 import { integrationService } from "@/server/services/integrations";
 import SettingsSection from "../SettingsSection";
 import AutomationsList from "./AutomationsList";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Automations · Settings · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Automations", "Settings") };
 
 export default function AutomationsPage() {
   return (

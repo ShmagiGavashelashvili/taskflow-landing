@@ -7,15 +7,9 @@ import { avatarToneOf, initialsOf } from "@/lib/people";
 import { isOverdue, PRIORITY_LABELS } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
 import type { Assignee } from "./types";
+import { PRIORITY_CLASSES } from "@/constants/tasks";
 
 /** Small pieces of task metadata shared by the board card and the list view. */
-
-const PRIORITY_CLASSES: Record<TaskPriority, string> = {
-  low: "bg-slate-100 text-slate-600",
-  medium: "bg-blue-50 text-blue-700",
-  high: "bg-amber-50 text-amber-700",
-  urgent: "bg-rose-50 text-rose-700",
-};
 
 export function PriorityBadge({ priority }: { priority: TaskPriority }) {
   return (

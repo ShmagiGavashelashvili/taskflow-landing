@@ -9,6 +9,7 @@ import { isOptimisticComment, useCommentMutations } from "@/hooks/useComments";
 import { commentQueries } from "@/lib/api/comments";
 import type { CommentView, Person } from "@/lib/schemas/comments";
 import { avatarToneOf, initialsOf } from "@/lib/people";
+import { COMMENT_MAX_LENGTH } from "@/lib/schemas/comments";
 
 interface CommentThreadProps {
   taskId: string;
@@ -16,7 +17,6 @@ interface CommentThreadProps {
   currentUser: Person;
 }
 
-const MAX_LENGTH = 2000;
 const FIELD_CLASSES =
   "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[15px] text-ink shadow-xs outline-none focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-brand/20";
 
@@ -71,7 +71,7 @@ export default function CommentThread({ taskId, currentUser }: CommentThreadProp
           id="new-comment"
           value={draft}
           rows={3}
-          maxLength={MAX_LENGTH}
+          maxLength={COMMENT_MAX_LENGTH}
           placeholder="Write a comment…"
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={(event) => submitOnModEnter(event, submit)}
@@ -129,7 +129,7 @@ function CommentItem({ comment, own, onEdit, onDelete }: CommentItemProps) {
               id={`edit-${comment.id}`}
               value={draft}
               rows={3}
-              maxLength={MAX_LENGTH}
+              maxLength={COMMENT_MAX_LENGTH}
               autoFocus
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {

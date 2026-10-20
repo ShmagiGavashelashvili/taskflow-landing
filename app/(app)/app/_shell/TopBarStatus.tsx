@@ -6,6 +6,7 @@ import { trialDaysLeft } from "@/lib/trial";
 import type { AppSession } from "@/server/auth/session";
 import { isDemoMode } from "@/server/config";
 import { getContainer } from "@/server/container";
+import { BILLING_PATH } from "@/lib/app-paths";
 
 /** Right side of the top bar: the demo badge and the trial countdown. Rendered inside Suspense. */
 export default function TopBarStatus({ session }: { session: AppSession }) {
@@ -23,7 +24,7 @@ export default function TopBarStatus({ session }: { session: AppSession }) {
       )}
       {daysLeft !== null && daysLeft > 0 && (
         // Owners can act on the countdown, so it links to billing for them.
-        <TrialBadge href={session.role === "owner" ? "/app/settings/billing" : undefined}>
+        <TrialBadge href={session.role === "owner" ? BILLING_PATH : undefined}>
           <Clock3 className="size-3.5" aria-hidden="true" />
           {planName} trial: {daysLeft} {daysLeft === 1 ? "day" : "days"} left
         </TrialBadge>

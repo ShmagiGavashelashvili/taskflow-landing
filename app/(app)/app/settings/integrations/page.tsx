@@ -5,8 +5,9 @@ import { getContainer } from "@/server/container";
 import { integrationService } from "@/server/services/integrations";
 import SettingsSection from "../SettingsSection";
 import IntegrationsList from "./IntegrationsList";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Integrations · Settings · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Integrations", "Settings") };
 
 export default function IntegrationsPage() {
   return (

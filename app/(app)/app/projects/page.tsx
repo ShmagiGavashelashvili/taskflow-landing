@@ -10,8 +10,9 @@ import { getContainer } from "@/server/container";
 import { projectService } from "@/server/services/projects";
 import NewProjectButton from "./NewProjectButton";
 import UnarchiveButton from "./UnarchiveButton";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Projects · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Projects") };
 
 /** Every project in the workspace: active ones, and archived ones that can be restored. */
 export default function ProjectsPage() {

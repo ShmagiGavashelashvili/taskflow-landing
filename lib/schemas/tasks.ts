@@ -37,8 +37,15 @@ export interface TaskFilters {
   search?: string;
 }
 
-const title = z.string().trim().min(1, "Please give the task a title.").max(200, "Keep it under 200 characters.");
-const description = z.string().max(5000, "Keep it under 5000 characters.");
+export const TASK_TITLE_MAX = 200;
+export const TASK_DESCRIPTION_MAX = 5000;
+
+const title = z
+  .string()
+  .trim()
+  .min(1, "Please give the task a title.")
+  .max(TASK_TITLE_MAX, `Keep it under ${TASK_TITLE_MAX} characters.`);
+const description = z.string().max(TASK_DESCRIPTION_MAX, `Keep it under ${TASK_DESCRIPTION_MAX} characters.`);
 const assigneeId = z.string().min(1).nullable();
 
 export const createTaskRequestSchema = z.object({

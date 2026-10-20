@@ -7,8 +7,9 @@ import { DomainError } from "@/server/domain/errors";
 import { inviteService } from "@/server/services/invites";
 import { AuthCard, FormSkeleton } from "../../AuthCard";
 import AcceptInviteForm from "./AcceptInviteForm";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Join a workspace · TaskFlow", robots: { index: false } };
+export const metadata: Metadata = { title: pageTitle("Join a workspace"), robots: { index: false } };
 
 /** Public invite acceptance. Not behind proxy.ts, so it works logged in or out. */
 export default function InvitePage({ params }: PageProps<"/invite/[token]">) {

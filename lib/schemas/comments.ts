@@ -11,7 +11,13 @@ export type Person = z.infer<typeof personSchema>;
 export const commentViewSchema = commentSchema.extend({ author: personSchema });
 export type CommentView = z.infer<typeof commentViewSchema>;
 
-const body = z.string().trim().min(1, "Write something first.").max(2000, "Keep it under 2000 characters.");
+export const COMMENT_MAX_LENGTH = 2000;
+
+const body = z
+  .string()
+  .trim()
+  .min(1, "Write something first.")
+  .max(COMMENT_MAX_LENGTH, `Keep it under ${COMMENT_MAX_LENGTH} characters.`);
 
 /** Create or edit a comment; only its author can edit or delete it. */
 export const commentRequestSchema = z.object({ body });

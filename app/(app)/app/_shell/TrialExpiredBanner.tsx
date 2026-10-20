@@ -4,6 +4,7 @@ import { planOffer } from "@/lib/billing";
 import { isTrialExpired } from "@/lib/plans";
 import { getContainer } from "@/server/container";
 import type { BannerProps } from "./AppBanners";
+import { BILLING_PATH } from "@/lib/app-paths";
 
 /** Shown to everyone once the workspace's trial has ended and it reads as Free. */
 export default function TrialExpiredBanner({ session }: BannerProps) {
@@ -22,7 +23,7 @@ export default function TrialExpiredBanner({ session }: BannerProps) {
         </span>
       </p>
       {role === "owner" && (
-        <Link href="/app/settings/billing" className="font-semibold underline underline-offset-2 hover:no-underline">
+        <Link href={BILLING_PATH} className="font-semibold underline underline-offset-2 hover:no-underline">
           Choose a plan
         </Link>
       )}

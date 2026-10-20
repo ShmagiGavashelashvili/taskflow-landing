@@ -6,8 +6,9 @@ import { isDemoMode } from "@/server/config";
 import { DEMO_ACCOUNT } from "@/server/seed";
 import { AuthCard, FormSkeleton } from "../AuthCard";
 import LoginForm from "./LoginForm";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Log in · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Log in") };
 
 export default function LoginPage({ searchParams }: PageProps<"/login">) {
   return (

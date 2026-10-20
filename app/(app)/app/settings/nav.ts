@@ -1,3 +1,11 @@
+import {
+  AUTOMATIONS_PATH,
+  BILLING_PATH,
+  INTEGRATIONS_PATH,
+  MEMBERS_PATH,
+  PROFILE_PATH,
+  WORKSPACE_PATH,
+} from "@/lib/app-paths";
 import type { Role } from "@/lib/schemas/entities";
 import type { NavItem } from "../_shell/NavLinks";
 
@@ -14,12 +22,12 @@ type SettingsNavItem = NavItem & {
  * into a client module like _shell/MainNav.tsx.
  */
 export const SETTINGS_NAV: SettingsNavItem[] = [
-  { href: "/app/settings/profile", label: "Profile" },
-  { href: "/app/settings/workspace", label: "Workspace" },
-  { href: "/app/settings/members", label: "Members" },
-  { href: "/app/settings/billing", label: "Billing", ownerOnly: true },
-  { href: "/app/settings/integrations", label: "Integrations" },
-  { href: "/app/settings/automations", label: "Automations" },
+  { href: PROFILE_PATH, label: "Profile" },
+  { href: WORKSPACE_PATH, label: "Workspace" },
+  { href: MEMBERS_PATH, label: "Members" },
+  { href: BILLING_PATH, label: "Billing", ownerOnly: true },
+  { href: INTEGRATIONS_PATH, label: "Integrations" },
+  { href: AUTOMATIONS_PATH, label: "Automations" },
 ];
 
 /** The settings sections a role sees. */

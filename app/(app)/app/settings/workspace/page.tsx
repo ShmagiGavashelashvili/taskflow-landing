@@ -3,8 +3,9 @@ import { Suspense } from "react";
 import { getAppSession } from "@/server/auth/app-session";
 import SettingsSection from "../SettingsSection";
 import WorkspaceForm from "./WorkspaceForm";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Workspace · Settings · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Workspace", "Settings") };
 
 export default function WorkspacePage() {
   return (

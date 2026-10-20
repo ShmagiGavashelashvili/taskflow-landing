@@ -1,17 +1,10 @@
 import { AlarmClock, CheckCircle2, CircleDot } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { BAR_TONE_CLASSES } from "@/constants/tones";
-import { TASK_STATUSES, type TaskStatus } from "@/lib/schemas/entities";
+import { STATUS_BAR_CLASSES } from "@/constants/tasks";
+import { TASK_STATUSES } from "@/lib/schemas/entities";
 import type { DashboardStats } from "@/lib/schemas/dashboard";
 import { STATUS_LABELS } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
-
-const STATUS_BARS: Record<TaskStatus, string> = {
-  todo: BAR_TONE_CLASSES.slate,
-  in_progress: BAR_TONE_CLASSES.blue,
-  in_review: BAR_TONE_CLASSES.amber,
-  done: BAR_TONE_CLASSES.teal,
-};
 
 /** Headline counts plus the split of tasks across board columns. */
 export default function Stats({ stats }: { stats: DashboardStats }) {
@@ -29,7 +22,7 @@ export default function Stats({ stats }: { stats: DashboardStats }) {
             TASK_STATUSES.map((status) => (
               <span
                 key={status}
-                className={STATUS_BARS[status]}
+                className={STATUS_BAR_CLASSES[status]}
                 style={{ width: `${(stats.byStatus[status] / total) * 100}%` }}
               />
             ))}
@@ -37,7 +30,7 @@ export default function Stats({ stats }: { stats: DashboardStats }) {
         <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
           {TASK_STATUSES.map((status) => (
             <div key={status} className="flex items-center gap-1.5">
-              <span aria-hidden="true" className={cn("size-2 rounded-full", STATUS_BARS[status])} />
+              <span aria-hidden="true" className={cn("size-2 rounded-full", STATUS_BAR_CLASSES[status])} />
               <dt className="text-muted-foreground">{STATUS_LABELS[status]}</dt>
               <dd className="ml-auto font-semibold text-ink">{stats.byStatus[status]}</dd>
             </div>

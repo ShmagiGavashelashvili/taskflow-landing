@@ -11,8 +11,9 @@ import { projectService } from "@/server/services/projects";
 import { timelineService } from "@/server/services/timeline";
 import TimelineGrid from "./TimelineGrid";
 import TimelineToolbar from "./TimelineToolbar";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Timeline · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Timeline") };
 
 /** Tasks due in a week, grouped by project. `?week=<any date in it>&project=<id>`; read-only. */
 export default function TimelinePage({ searchParams }: PageProps<"/app/timeline">) {

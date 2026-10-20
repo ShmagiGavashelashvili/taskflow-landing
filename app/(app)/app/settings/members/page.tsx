@@ -5,8 +5,9 @@ import { getContainer } from "@/server/container";
 import { inviteService } from "@/server/services/invites";
 import { workspaceService } from "@/server/services/workspace";
 import MembersPanel from "./MembersPanel";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Members · Settings · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Members", "Settings") };
 
 export default function MembersPage() {
   return (

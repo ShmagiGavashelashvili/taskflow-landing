@@ -4,8 +4,9 @@ import { getAppSession } from "@/server/auth/app-session";
 import SettingsSection from "../SettingsSection";
 import ChangePasswordForm from "./ChangePasswordForm";
 import ProfileForm from "./ProfileForm";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Profile · Settings · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Profile", "Settings") };
 
 export default function ProfilePage() {
   return (

@@ -24,8 +24,8 @@ import { initialsOf } from "@/lib/people";
 import { createInviteRequestSchema, type Member, type PendingInvite } from "@/lib/schemas/workspace";
 import type { AvatarTone } from "@/types";
 import SettingsSection from "../SettingsSection";
+import { BILLING_PATH } from "@/lib/app-paths";
 
-const BILLING_PATH = "/app/settings/billing";
 
 interface MembersPanelProps {
   isOwner: boolean;
