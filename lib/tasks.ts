@@ -51,6 +51,55 @@ export function moveTask<T extends Movable>(
     .sort(compareBoardOrder);
 }
 
+type Editable = Movable & Pick<Task, "updatedAt">;
+
+/** Fields a task edit may change. A status change without a position lands last in the column. */
+export type TaskEdit = Partial<Pick<Task, "title" | "description" | "status" | "position" | "priority" | "assigneeId" | "dueDate">>;
+
+/**
+ * Applies an edit to `taskId` the way the server saves it: a status change (or an explicit
+ * position) moves the task and renumbers its columns, moving into done sets `completedAt`, and
+ * `updatedAt` becomes `now`. Returns a new list in board order. The server and optimistic
+ * updates both call this, so they cannot disagree. Unknown ids are a no-op.
+ */
+export function editTask<T extends Editable>(tasks: readonly T[], taskId: string, edit: TaskEdit, now: Date): T[] {
+  const task = tasks.find((t) => t.id === taskId);
+  if (!task) return [...tasks];
+
+  const { status, position, ...fields } = edit;
+  const defined = Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined));
+  const moves = (status !== undefined && status !== task.status) || position !== undefined;
+  const placed = moves
+    ? moveTask(tasks, taskId, { status: status ?? task.status, position: position ?? Number.MAX_SAFE_INTEGER }, now)
+    : [...tasks];
+  return placed.map((t) => (t.id === taskId ? ({ ...t, ...defined, updatedAt: now.toISOString() } as T) : t));
+}
+
+/** Removes `taskId` and closes the gap in its column. Returns a new list in board order. */
+export function removeTask<T extends Movable>(tasks: readonly T[], taskId: string): T[] {
+  const task = tasks.find((t) => t.id === taskId);
+  if (!task) return [...tasks];
+  const remaining = tasks.filter((t) => t.id !== taskId).sort(compareBoardOrder);
+  const column = remaining.filter((t) => t.status === task.status);
+  return remaining.map((t) => {
+    const position = column.indexOf(t);
+    return position === -1 || t.position === position ? t : { ...t, position };
+  });
+}
+
+/** The minimal patches that turn `before` into `after`, matched by id. Tasks missing from `after` are skipped. */
+export function changedTasks<T extends { id: string }>(before: readonly T[], after: readonly T[]): { id: string; patch: Partial<Omit<T, "id">> }[] {
+  const old = new Map(before.map((t) => [t.id, t]));
+  return after.flatMap((next) => {
+    const prev = old.get(next.id);
+    if (!prev) return [];
+    const patch = Object.fromEntries(
+      (Object.keys(next) as (keyof T)[]).filter((key) => next[key] !== prev[key]).map((key) => [key, next[key]]),
+    ) as Partial<Omit<T, "id">>;
+    return Object.keys(patch).length > 0 ? [{ id: next.id, patch }] : [];
+  });
+}
+
 /** Today's date (UTC) as `YYYY-MM-DD`, the calendar the API uses for due dates. */
 export function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);

@@ -12,6 +12,7 @@ import { billingApi } from "@/lib/api/billing";
 import type { FieldErrors } from "@/lib/api/errors";
 import { periodTotal, seatPrice } from "@/lib/billing";
 import { describeFailure } from "@/lib/forms";
+import { describeLimits } from "@/lib/plans";
 import { TEST_CARD_NUMBER, type PlanOffer, type Subscription } from "@/lib/schemas/billing";
 import { PLAN_IDS, type BillingPeriod, type Invoice, type PlanId } from "@/lib/schemas/entities";
 import { cn } from "@/lib/utils";
@@ -271,7 +272,7 @@ function ChangePlanForm({
         <DialogDescription>
           {paid
             ? "This is a mock checkout. No card is charged; only the test card is accepted."
-            : `${plan.name} allows up to ${plan.limits.maxMembers} members and ${plan.limits.maxActiveProjects} active projects, without timeline, reports, integrations or automations. Nothing is deleted.`}
+            : `${plan.name} allows ${describeLimits(plan.limits)}. Nothing is deleted.`}
         </DialogDescription>
       </DialogHeader>
 

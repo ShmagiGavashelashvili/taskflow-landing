@@ -5,7 +5,7 @@ import { isoDate, isOverdue } from "@/lib/tasks";
 import { weekStart } from "@/lib/weeks";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
-import { requireFeature } from "@/server/domain/plan-guards";
+import { workspaceCapacity } from "@/server/domain/capacity";
 import type { Task } from "@/server/domain/types";
 import { toProjectRef } from "./projects";
 import { taskService } from "./tasks";
@@ -52,7 +52,7 @@ export function dashboardService(container: Container) {
     /** Workload per member and progress per project. Pro and Business only. */
     async reports(session: AppSession): Promise<DashboardReportsResponse> {
       const now = container.clock.now();
-      requireFeature(session.workspace, now, "reports");
+      workspaceCapacity(container, session.workspace).requireFeature("reports");
       const today = isoDate(now);
       const [{ projects, tasks }, members] = await Promise.all([
         activeProjects(session),

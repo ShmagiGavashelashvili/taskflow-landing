@@ -5,7 +5,7 @@ import { addDays, daysBetween, weekStart } from "@/lib/weeks";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
-import { requireFeature } from "@/server/domain/plan-guards";
+import { workspaceCapacity } from "@/server/domain/capacity";
 import { projectService, toProjectRef } from "./projects";
 
 function invalidRange(message: string): DomainError {
@@ -17,7 +17,7 @@ export function timelineService(container: Container) {
   return {
     async list(session: AppSession, query: TimelineQuery = {}): Promise<TimelineResponse> {
       const now = container.clock.now();
-      requireFeature(session.workspace, now, "timeline");
+      workspaceCapacity(container, session.workspace).requireFeature("timeline");
 
       const from = query.from ?? weekStart(isoDate(now));
       const to = query.to ?? addDays(from, 6);

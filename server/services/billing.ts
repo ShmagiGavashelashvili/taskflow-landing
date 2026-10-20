@@ -2,7 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import type { z } from "zod";
 import { PLAN_OFFERS, periodTotal, planOffer } from "@/lib/billing";
-import { effectivePlan, isTrialExpired, PLAN_LIMITS, planLimits } from "@/lib/plans";
+import { effectivePlan, isTrialExpired, memberSlotsUsed, PLAN_LIMITS, type WorkspaceUsage } from "@/lib/plans";
 import {
   TEST_CARD_NUMBER,
   type BillingResponse,
@@ -14,9 +14,9 @@ import { trialDaysLeft } from "@/lib/trial";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
-import { isPending } from "@/server/domain/invites";
+import { workspaceCapacity } from "@/server/domain/capacity";
 import type { BillingPeriod, Invoice, PlanId, Workspace } from "@/server/domain/types";
-import { requireOwner } from "@/server/services/workspace";
+import { requireOwner } from "@/server/domain/access";
 
 type ChangePlanInput = z.output<typeof changePlanRequestSchema>;
 
@@ -31,11 +31,11 @@ function periodLabel(from: Date, period: BillingPeriod): string {
 }
 
 /** Why `usage` doesn't fit `target`'s limits, or `null` when it does. */
-function overLimitReason(target: PlanId, usage: Subscription["usage"]): string | null {
+function overLimitReason(target: PlanId, usage: WorkspaceUsage): string | null {
   const { maxMembers, maxActiveProjects } = PLAN_LIMITS[target];
   const name = planOffer(target).name;
   const problems: string[] = [];
-  const people = usage.members + usage.pendingInvites;
+  const people = memberSlotsUsed(usage);
   if (maxMembers !== null && people > maxMembers) {
     const detail = usage.pendingInvites > 0 ? `${people} members including pending invites` : `${people} members`;
     problems.push(`you have ${detail} and ${name} allows ${maxMembers}`);
@@ -63,22 +63,9 @@ function chargeCard(payment: ChangePlanInput["payment"]): void {
 
 /** Mock billing for the signed-in owner's workspace: subscription, plan changes, invoices. */
 export function billingService(container: Container) {
-  /** Counts active projects straight from the projects repository. */
-  async function usage(workspaceId: string, now: Date): Promise<Subscription["usage"]> {
-    const [memberships, invites, activeProjects] = await Promise.all([
-      container.memberships.listByWorkspace(workspaceId),
-      container.invites.listByWorkspace(workspaceId),
-      container.projects.list({ workspaceId, archived: false }),
-    ]);
-    return {
-      members: memberships.length,
-      pendingInvites: invites.filter((invite) => isPending(invite, now)).length,
-      activeProjects: activeProjects.length,
-    };
-  }
-
   async function subscription(workspace: Workspace): Promise<Subscription> {
     const now = container.clock.now();
+    const capacity = workspaceCapacity(container, workspace);
     return {
       plan: workspace.plan,
       effectivePlan: effectivePlan(workspace, now),
@@ -88,8 +75,8 @@ export function billingService(container: Container) {
         daysLeft: trialDaysLeft(workspace.trialEndsAt, now),
         expired: isTrialExpired(workspace, now),
       },
-      limits: planLimits(workspace, now),
-      usage: await usage(workspace.id, now),
+      limits: capacity.limits,
+      usage: await capacity.usage(),
     };
   }
 
@@ -119,7 +106,7 @@ export function billingService(container: Container) {
         throw new DomainError("CONFLICT", `You're already on ${label}.`);
       }
 
-      const current = await usage(workspace.id, now);
+      const current = await workspaceCapacity(container, workspace).usage();
       const reason = overLimitReason(plan, current);
       if (reason) throw new DomainError("CONFLICT", reason);
 
