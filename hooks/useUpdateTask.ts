@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { tasksApi, taskQueries } from "@/lib/api/tasks";
 import type { UpdateTaskRequest } from "@/lib/schemas/tasks";
+import { editTask } from "@/lib/tasks";
 
 /**
  * Edits a task from its detail view, optimistically: the detail updates at once, rolls back
@@ -19,9 +20,7 @@ export function useUpdateTask(taskId: string) {
     onMutate: async (patch) => {
       await queryClient.cancelQueries({ queryKey, exact: true });
       const previous = queryClient.getQueryData(queryKey);
-      queryClient.setQueryData(queryKey, (task) =>
-        task && { ...task, ...patch, updatedAt: new Date().toISOString() },
-      );
+      queryClient.setQueryData(queryKey, (task) => task && editTask([task], taskId, patch, new Date())[0]);
       return { previous };
     },
     // The PATCH response has no creator; keep the one we have.

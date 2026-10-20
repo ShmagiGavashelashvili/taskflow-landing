@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import type { z } from "zod";
 import type { createTaskRequestSchema, MoveTaskRequest, taskListQuerySchema, updateTaskRequestSchema, BoardTask, TaskDetail } from "@/lib/schemas/tasks";
 import type { Person } from "@/lib/schemas/comments";
-import { isoDate, moveTask } from "@/lib/tasks";
+import { changedTasks, editTask, isoDate, removeTask } from "@/lib/tasks";
 import { DAY_MS } from "@/lib/weeks";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
@@ -50,17 +50,13 @@ export function taskService(container: Container) {
     }
   }
 
-  /** Applies a move to the whole project and saves every task whose place changed. */
-  async function applyMove(task: Task, to: MoveTaskRequest, now: Date): Promise<Task> {
-    const siblings = await container.tasks.list({ projectIds: [task.projectId] });
-    const before = new Map(siblings.map((t) => [t.id, t]));
-    const patches = moveTask(siblings, task.id, to, now).flatMap((t) => {
-      const old = before.get(t.id)!;
-      if (t.id === task.id) return [{ id: t.id, patch: { status: t.status, position: t.position, completedAt: t.completedAt } }];
-      return old.position === t.position ? [] : [{ id: t.id, patch: { position: t.position } }];
-    });
-    await container.tasks.updateMany(patches);
-    return (await container.tasks.findById(task.id))!;
+  /** Applies `change` to the project's tasks, saves only what differs, and returns the result. */
+  async function saveChange(projectId: string, change: (tasks: Task[]) => Task[]): Promise<Task[]> {
+    const before = await container.tasks.list({ projectIds: [projectId] });
+    const after = change(before);
+    const patches = changedTasks(before, after);
+    if (patches.length > 0) await container.tasks.updateMany(patches);
+    return after;
   }
 
   return {
@@ -121,33 +117,24 @@ export function taskService(container: Container) {
       const { task } = await load(session, taskId);
       await requireAssignable(session, patch.assigneeId);
       const now = container.clock.now();
-      const { status, ...fields } = patch;
-      if (status !== undefined && status !== task.status) {
-        await applyMove(task, { status, position: Number.MAX_SAFE_INTEGER }, now);
-      }
-      const updated = await container.tasks.update(task.id, { ...fields, updatedAt: now.toISOString() });
-      if (!updated) throw new DomainError("NOT_FOUND", "That task doesn't exist or was deleted.");
-      return withCommentCount(updated);
+      const after = await saveChange(task.projectId, (tasks) => editTask(tasks, task.id, patch, now));
+      return withCommentCount(after.find((t) => t.id === task.id)!);
     },
 
     /** Places the task in a column at a position, renumbering its old and new columns. */
     async move(session: AppSession, taskId: string, to: MoveTaskRequest): Promise<BoardTask> {
       const { task } = await load(session, taskId);
       const now = container.clock.now();
-      await applyMove(task, to, now);
-      const updated = await container.tasks.update(task.id, { updatedAt: now.toISOString() });
-      return withCommentCount(updated!);
+      const after = await saveChange(task.projectId, (tasks) => editTask(tasks, task.id, to, now));
+      return withCommentCount(after.find((t) => t.id === task.id)!);
     },
 
     /** Deletes the task and its comments, and closes the gap in its column. */
     async delete(session: AppSession, taskId: string): Promise<void> {
       const { task } = await load(session, taskId);
       await container.comments.deleteByTasks([task.id]);
+      await saveChange(task.projectId, (tasks) => removeTask(tasks, task.id));
       await container.tasks.delete(task.id);
-      const column = await container.tasks.list({ projectIds: [task.projectId], status: task.status });
-      await container.tasks.updateMany(
-        column.flatMap((t, position) => (t.position === position ? [] : [{ id: t.id, patch: { position } }])),
-      );
     },
   };
 }
