@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { ProjectRef } from "@/lib/schemas/dashboard";
 import { addDays } from "@/lib/weeks";
+import { TIMELINE_PATH } from "@/lib/app-paths";
+import { FILTER_ALL } from "@/constants/ui";
 
-const TIMELINE_PATH = "/app/timeline";
-const ALL = "all";
 
 /** The timeline URL for a week and project; the current week and "all projects" are left out. */
 function timelineHref(week: string, thisWeek: string, projectId: string | null): string {
@@ -58,14 +58,14 @@ export default function TimelineToolbar({ projects, projectId, week, thisWeek }:
       </div>
 
       <Select
-        value={projectId ?? ALL}
-        onValueChange={(value) => router.push(timelineHref(week, thisWeek, value === ALL ? null : value))}
+        value={projectId ?? FILTER_ALL}
+        onValueChange={(value) => router.push(timelineHref(week, thisWeek, value === FILTER_ALL ? null : value))}
       >
         <SelectTrigger aria-label="Filter by project" className="w-48 bg-surface">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL}>All projects</SelectItem>
+          <SelectItem value={FILTER_ALL}>All projects</SelectItem>
           {projects.map((project) => (
             <SelectItem key={project.id} value={project.id}>
               {project.name}

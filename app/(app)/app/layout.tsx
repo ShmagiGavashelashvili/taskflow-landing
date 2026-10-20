@@ -11,8 +11,9 @@ import { MainNav, MainNavFallback } from "./_shell/MainNav";
 import SidebarProjects, { SidebarProjectsSkeleton, SidebarProjectsUnavailable } from "./_shell/SidebarProjects";
 import TopBarStatus from "./_shell/TopBarStatus";
 import UserMenu, { UserMenuSkeleton, UserMenuUnavailable } from "./_shell/UserMenu";
+import { SITE_NAME } from "@/constants/site";
 
-export const metadata: Metadata = { title: "TaskFlow", robots: { index: false } };
+export const metadata: Metadata = { title: SITE_NAME, robots: { index: false } };
 
 /**
  * The protected app shell. The chrome is static (prerendered); everything that reads the

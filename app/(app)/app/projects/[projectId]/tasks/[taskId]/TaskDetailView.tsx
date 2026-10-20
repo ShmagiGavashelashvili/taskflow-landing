@@ -21,6 +21,7 @@ import { isOverdue, PRIORITY_LABELS, STATUS_LABELS } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
 import type { Assignee } from "../../types";
 import CommentThread from "./CommentThread";
+import { TASK_DESCRIPTION_MAX, TASK_TITLE_MAX, UNASSIGNED } from "@/lib/schemas/tasks";
 
 interface TaskDetailViewProps {
   taskId: string;
@@ -31,9 +32,6 @@ interface TaskDetailViewProps {
   today: string;
 }
 
-const UNASSIGNED = "unassigned";
-const TITLE_MAX = 200;
-const DESCRIPTION_MAX = 5000;
 
 /**
  * A task's own page: every field edits in place and saves optimistically, plus delete (with
@@ -86,7 +84,7 @@ function TaskFields({ task }: { task: TaskDetail }) {
       <InlineField
         label="Title"
         value={task.title}
-        maxLength={TITLE_MAX}
+        maxLength={TASK_TITLE_MAX}
         required
         onSave={(title) => update.mutate({ title })}
         render={(props) => (
@@ -99,7 +97,7 @@ function TaskFields({ task }: { task: TaskDetail }) {
       <InlineField
         label="Description"
         value={task.description}
-        maxLength={DESCRIPTION_MAX}
+        maxLength={TASK_DESCRIPTION_MAX}
         onSave={(description) => update.mutate({ description })}
         render={(props) => (
           <textarea

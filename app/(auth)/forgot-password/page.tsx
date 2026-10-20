@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthCard } from "../AuthCard";
 import ForgotPasswordForm from "./ForgotPasswordForm";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Reset your password · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Reset your password") };
 
 export default function ForgotPasswordPage() {
   return (

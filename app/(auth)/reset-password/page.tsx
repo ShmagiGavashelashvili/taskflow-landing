@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AuthCard, FormSkeleton } from "../AuthCard";
 import ResetPasswordForm from "./ResetPasswordForm";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Set a new password · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Set a new password") };
 
 export default function ResetPasswordPage({ searchParams }: PageProps<"/reset-password">) {
   return (

@@ -10,6 +10,7 @@ import { UNASSIGNED, type TaskFilters } from "@/lib/schemas/tasks";
 import { PRIORITY_LABELS } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
 import type { Assignee } from "./types";
+import { FILTER_ALL, SEARCH_DELAY_MS } from "@/constants/ui";
 
 export type ProjectViewMode = "board" | "list";
 
@@ -21,8 +22,6 @@ interface TaskToolbarProps {
   members: readonly Assignee[];
 }
 
-const ALL = "all";
-const SEARCH_DELAY_MS = 250;
 
 /** Board/list toggle, filters (assignee, priority, overdue) and title search. */
 export default function TaskToolbar({ view, onViewChange, filters, onFiltersChange, members }: TaskToolbarProps) {
@@ -64,14 +63,14 @@ export default function TaskToolbar({ view, onViewChange, filters, onFiltersChan
       </div>
 
       <Select
-        value={filters.assigneeId ?? ALL}
-        onValueChange={(value) => onFiltersChange({ ...filters, assigneeId: value === ALL ? undefined : value })}
+        value={filters.assigneeId ?? FILTER_ALL}
+        onValueChange={(value) => onFiltersChange({ ...filters, assigneeId: value === FILTER_ALL ? undefined : value })}
       >
         <SelectTrigger aria-label="Filter by assignee" className="bg-surface">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL}>Anyone</SelectItem>
+          <SelectItem value={FILTER_ALL}>Anyone</SelectItem>
           <SelectItem value={UNASSIGNED}>Unassigned</SelectItem>
           {members.map((member) => (
             <SelectItem key={member.id} value={member.id}>
@@ -82,16 +81,16 @@ export default function TaskToolbar({ view, onViewChange, filters, onFiltersChan
       </Select>
 
       <Select
-        value={filters.priority ?? ALL}
+        value={filters.priority ?? FILTER_ALL}
         onValueChange={(value) =>
-          onFiltersChange({ ...filters, priority: value === ALL ? undefined : (value as TaskFilters["priority"]) })
+          onFiltersChange({ ...filters, priority: value === FILTER_ALL ? undefined : (value as TaskFilters["priority"]) })
         }
       >
         <SelectTrigger aria-label="Filter by priority" className="bg-surface">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL}>Any priority</SelectItem>
+          <SelectItem value={FILTER_ALL}>Any priority</SelectItem>
           {TASK_PRIORITIES.map((priority) => (
             <SelectItem key={priority} value={priority}>
               {PRIORITY_LABELS[priority]}

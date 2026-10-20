@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
 import { describeFailure } from "@/lib/forms";
 import { cn } from "@/lib/utils";
+import { BILLING_PATH } from "@/lib/app-paths";
 
 export interface ToggleItem<Id extends string> {
   id: Id;
@@ -74,7 +75,7 @@ export default function FeatureToggleList<Id extends string>({
           </div>
           {isOwner && (
             <Button asChild className="shrink-0">
-              <Link href="/app/settings/billing">Upgrade plan</Link>
+              <Link href={BILLING_PATH}>Upgrade plan</Link>
             </Button>
           )}
         </div>

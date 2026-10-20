@@ -4,8 +4,9 @@ import { Suspense } from "react";
 import { planIdSchema } from "@/lib/schemas/entities";
 import { AuthCard, FormSkeleton } from "../AuthCard";
 import RegisterForm from "./RegisterForm";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Start your free trial · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Start your free trial") };
 
 export default function RegisterPage({ searchParams }: PageProps<"/register">) {
   return (

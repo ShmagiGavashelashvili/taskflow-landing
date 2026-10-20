@@ -5,8 +5,9 @@ import { getContainer } from "@/server/container";
 import { billingService } from "@/server/services/billing";
 import SettingsSection from "../SettingsSection";
 import BillingPanel from "./BillingPanel";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Billing · Settings · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Billing", "Settings") };
 
 export default function BillingPage() {
   return (

@@ -1,14 +1,13 @@
 import { format, parseISO } from "date-fns";
 import Link from "next/link";
 import { BAR_TONE_CLASSES } from "@/constants/tones";
+import { TIMELINE_COLUMNS_CLASS } from "@/constants/timeline";
 import { projectPath, taskPath } from "@/lib/app-paths";
 import type { Task } from "@/lib/schemas/entities";
 import type { TimelineResponse } from "@/lib/schemas/timeline";
 import { isOverdue, STATUS_LABELS } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
 import { addDays } from "@/lib/weeks";
-
-const COLUMNS = "grid-cols-[9rem_repeat(7,minmax(7.5rem,1fr))]";
 
 /** A read-only week: one row per project, one column per day, tasks in the day they're due. */
 export default function TimelineGrid({ timeline, today }: { timeline: TimelineResponse; today: string }) {
@@ -18,9 +17,9 @@ export default function TimelineGrid({ timeline, today }: { timeline: TimelineRe
 
   return (
     <div className="grid gap-3">
-      <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
-        <div role="table" aria-label="Tasks due this week by project" className="min-w-fit">
-          <div role="row" className={cn("grid border-b border-line", COLUMNS)}>
+      <div className="rounded-2xl md:overflow-x-auto border border-line bg-surface">
+        <div role="table" aria-label="Tasks due this week by project" className="md:min-w-fit">
+          <div role="row" className={cn("hidden border-b border-line md:grid", TIMELINE_COLUMNS_CLASS)}>
             <span role="columnheader" className="px-3 py-2.5 text-xs font-semibold text-muted-foreground uppercase">
               Project
             </span>
@@ -39,20 +38,34 @@ export default function TimelineGrid({ timeline, today }: { timeline: TimelineRe
             ))}
           </div>
           {timeline.projects.map((project) => (
-            <div key={project.id} role="row" className={cn("grid border-b border-line last:border-b-0", COLUMNS)}>
+            <div key={project.id} role="row" className={cn("border-b border-line last:border-b-0 md:grid", TIMELINE_COLUMNS_CLASS)}>
               <span role="rowheader" className="flex min-w-0 items-start gap-2 px-3 py-3">
                 <span aria-hidden="true" className={cn("mt-1.5 size-2.5 shrink-0 rounded-full", BAR_TONE_CLASSES[project.color])} />
                 <Link href={projectPath(project.id)} className="text-sm font-semibold text-ink hover:text-brand">
                   {project.name}
                 </Link>
               </span>
-              {days.map((day) => (
-                <div key={day} role="cell" className={cn("grid content-start gap-1.5 border-l border-line p-1.5", day === today && "bg-tint/40")}>
-                  {tasksOn(project.id, day).map((task) => (
-                    <TaskChip key={task.id} task={task} today={today} />
-                  ))}
-                </div>
-              ))}
+              {days.map((day) => {
+                const tasks = tasksOn(project.id, day);
+                return (
+                  <div
+                    key={day}
+                    role="cell"
+                    className={cn(
+                      "content-start gap-1.5 p-1.5 md:grid md:border-l md:border-line",
+                      tasks.length > 0 ? "grid" : "hidden",
+                      day === today && "bg-tint/40",
+                    )}
+                  >
+                    <time dateTime={day} className="px-1 text-xs font-semibold text-muted-foreground uppercase md:hidden">
+                      {format(parseISO(day), "EEE d")}
+                    </time>
+                    {tasks.map((task) => (
+                      <TaskChip key={task.id} task={task} today={today} />
+                    ))}
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>

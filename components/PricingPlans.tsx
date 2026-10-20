@@ -7,18 +7,10 @@ import { useState } from "react";
 import { registerUrl } from "@/lib/auth/paths";
 import { buttonClass } from "@/lib/ui";
 import type { Plan } from "@/types";
+import { BILLING_PERIOD_OPTIONS } from "@/constants/billing";
+import type { BillingPeriod } from "@/lib/schemas/entities";
 
-type Billing = "monthly" | "yearly";
-
-interface BillingOption {
-  value: Billing;
-  label: string;
-}
-
-const BILLING_OPTIONS: BillingOption[] = [
-  { value: "monthly", label: "Monthly" },
-  { value: "yearly", label: "Yearly" },
-];
+type Billing = BillingPeriod;
 
 interface PricingPlansProps {
   plans: Plan[];
@@ -58,7 +50,7 @@ export default function PricingPlans({ plans }: PricingPlansProps) {
       <fieldset className="mx-auto mb-12 flex w-fit items-center gap-3">
         <legend className="sr-only">Billing period</legend>
         <div className="flex gap-1 rounded-2xl border border-line bg-white p-1.5 shadow-card">
-          {BILLING_OPTIONS.map((option) => (
+          {BILLING_PERIOD_OPTIONS.map((option) => (
             <label key={option.value} className="relative cursor-pointer">
               <input
                 type="radio"

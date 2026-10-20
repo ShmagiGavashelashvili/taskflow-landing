@@ -16,6 +16,7 @@ import {
 import { authApi } from "@/lib/api/auth";
 import { LOGIN_PATH, LOGOUT_PATH } from "@/lib/auth/paths";
 import { initialsOf } from "@/lib/people";
+import { PROFILE_PATH } from "@/lib/app-paths";
 
 interface UserMenuProps {
   name: string;
@@ -53,7 +54,7 @@ export default function UserMenu({ name, email }: UserMenuProps) {
         <DropdownMenuLabel className="truncate font-normal text-muted-foreground">{email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/app/settings/profile">
+          <Link href={PROFILE_PATH}>
             <UserRound aria-hidden="true" />
             Profile
           </Link>

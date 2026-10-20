@@ -13,8 +13,9 @@ import { commentService } from "@/server/services/comments";
 import { projectService } from "@/server/services/projects";
 import { taskService } from "@/server/services/tasks";
 import TaskDetailView from "./TaskDetailView";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Task · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Task") };
 
 type Props = PageProps<"/app/projects/[projectId]/tasks/[taskId]">;
 

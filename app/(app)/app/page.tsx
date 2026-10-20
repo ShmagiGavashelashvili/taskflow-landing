@@ -9,8 +9,9 @@ import { dashboardService } from "@/server/services/dashboard";
 import MyTasks from "./_dashboard/MyTasks";
 import { ProjectProgress, Workload } from "./_dashboard/Reports";
 import Stats from "./_dashboard/Stats";
+import { pageTitle } from "@/lib/page-title";
 
-export const metadata: Metadata = { title: "Dashboard · TaskFlow" };
+export const metadata: Metadata = { title: pageTitle("Dashboard") };
 
 /** Stats and the user's tasks on every plan; workload and project progress (reports) on Pro and Business. */
 export default function DashboardPage() {

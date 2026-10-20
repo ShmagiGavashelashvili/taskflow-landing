@@ -16,6 +16,7 @@ import { TEST_CARD_NUMBER, type PlanOffer, type Subscription } from "@/lib/schem
 import { PLAN_IDS, type BillingPeriod, type Invoice, type PlanId } from "@/lib/schemas/entities";
 import { cn } from "@/lib/utils";
 import SettingsSection from "../SettingsSection";
+import { BILLING_PERIOD_OPTIONS, PREFILLED_CARD_CVC, PREFILLED_CARD_EXPIRY } from "@/constants/billing";
 
 interface BillingPanelProps {
   subscription: Subscription;
@@ -27,11 +28,6 @@ interface Target {
   plan: PlanOffer;
   period: BillingPeriod;
 }
-
-const PERIODS: { value: BillingPeriod; label: string }[] = [
-  { value: "monthly", label: "Monthly" },
-  { value: "yearly", label: "Yearly" },
-];
 
 const usd = (amount: number) => `$${amount.toLocaleString("en-US")}`;
 const rank = (id: PlanId) => PLAN_IDS.indexOf(id);
@@ -55,7 +51,7 @@ export default function BillingPanel({ subscription: initial, plans, invoices: i
 
       <SettingsSection title="Change plan" description="Prices match our pricing page and are per member per month. Payments are simulated.">
         <div role="radiogroup" aria-label="Billing period" className="inline-flex rounded-full border border-line bg-bg p-1">
-          {PERIODS.map((option) => (
+          {BILLING_PERIOD_OPTIONS.map((option) => (
             <button
               key={option.value}
               type="button"
@@ -201,7 +197,7 @@ function PlanCard({
   );
 }
 
-const PREFILLED_CARD = { cardNumber: TEST_CARD_NUMBER, expiry: "12/34", cvc: "123" };
+const PREFILLED_CARD = { cardNumber: TEST_CARD_NUMBER, expiry: PREFILLED_CARD_EXPIRY, cvc: PREFILLED_CARD_CVC };
 
 function ChangePlanDialog({
   target,
