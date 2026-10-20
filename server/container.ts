@@ -3,6 +3,7 @@ import { databaseConnectionString, mockFailureRate, mockLatencyMs, mockPersistPa
 import { createMemoryRepositories } from "@/server/repositories/memory/repositories";
 import { withSimulatedNetwork } from "@/server/repositories/memory/simulate";
 import { MemoryStore } from "@/server/repositories/memory/store";
+import { processGlobal, setProcessGlobal } from "@/server/process-global";
 import type { Repositories } from "@/server/repositories/types";
 import { createSeedData } from "@/server/seed";
 import { Database } from "@/server/repositories/postgres/database";
@@ -59,15 +60,15 @@ function createContainer(): Container {
   });
 }
 
-// Kept on globalThis so dev-server hot reloads don't reset the store.
-const globalForContainer = globalThis as typeof globalThis & { __taskflowContainer?: Container };
+// Process-wide, so dev-server hot reloads and Next's separate bundles share one store.
+const CONTAINER_KEY = "container";
 
 /** The container for the current process, created (and seeded) on first access. */
 export function getContainer(): Container {
-  return (globalForContainer.__taskflowContainer ??= createContainer());
+  return processGlobal(CONTAINER_KEY, createContainer);
 }
 
 /** Replaces the process container; tests use this to start from a fresh seed. */
 export function setContainer(container: Container | undefined): void {
-  globalForContainer.__taskflowContainer = container;
+  setProcessGlobal(CONTAINER_KEY, container);
 }

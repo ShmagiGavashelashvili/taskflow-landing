@@ -1,7 +1,7 @@
 import "server-only";
 import type { ErrorCode, FieldErrors } from "@/lib/api/errors";
 
-/** Marks DomainErrors across module copies. */
+/** Marks DomainErrors across module copies (`Symbol.for` is shared by every copy in the process). */
 const BRAND = Symbol.for("taskflow.DomainError");
 
 /**
@@ -27,4 +27,9 @@ export class DomainError extends Error {
     super(message);
     this.name = "DomainError";
   }
+}
+
+/** Whether `error` is a DomainError, optionally with this `code`. Works across module copies. */
+export function isDomainError(error: unknown, code?: ErrorCode): error is DomainError {
+  return error instanceof DomainError && (code === undefined || error.code === code);
 }

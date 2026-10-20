@@ -5,7 +5,7 @@ import { ERROR_STATUS, type ApiErrorBody, type ErrorCode, type FieldErrors } fro
 import { endSession } from "@/server/auth/session";
 import { SESSION_COOKIE } from "@/server/auth/token";
 import { getContainer, type Container } from "@/server/container";
-import { DomainError } from "@/server/domain/errors";
+import { DomainError, isDomainError } from "@/server/domain/errors";
 import { runInRequestScope } from "@/server/request-scope";
 
 type Params = Record<string, string | string[] | undefined>;
@@ -41,8 +41,7 @@ export function route<P extends Params = Params>(
     } catch (error) {
       const response = toErrorResponse(error);
       // A session cookie that no longer resolves (expired, or its user is gone) is cleared.
-      const unauthenticated = error instanceof DomainError && error.code === "UNAUTHENTICATED";
-      if (unauthenticated && request.cookies.has(SESSION_COOKIE)) endSession(response);
+      if (isDomainError(error, "UNAUTHENTICATED") && request.cookies.has(SESSION_COOKIE)) endSession(response);
       return response;
     }
   };
@@ -65,7 +64,7 @@ export function errorResponse(code: ErrorCode, message: string, fieldErrors?: Fi
 }
 
 export function toErrorResponse(error: unknown): NextResponse<ApiErrorBody> {
-  if (error instanceof DomainError) return errorResponse(error.code, error.message, error.fieldErrors);
+  if (isDomainError(error)) return errorResponse(error.code, error.message, error.fieldErrors);
   console.error(error);
   return errorResponse("INTERNAL_ERROR", "Something went wrong. Please try again.");
 }

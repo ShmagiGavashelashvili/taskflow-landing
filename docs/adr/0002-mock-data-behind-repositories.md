@@ -36,6 +36,8 @@ Services, route handlers, schemas, the API client and the UI don't change.
 
 ## Consequences
 
+- Next bundles server code separately for pages and route handlers, so process-wide state (the container, the request scope) goes through `processGlobal` in `server/process-global.ts`, and `DomainError`s are recognised by brand (`isDomainError`) rather than by class.
+
 - The contract suite is what keeps the adapters from drifting: query semantics that exist twice (task filters in JS and in SQL) are asserted once, against both.
 
 - Seam A tests (route handlers called in-process against a fresh seeded container) are the regression suite for any future implementation. There are no separate repository or service unit tests.

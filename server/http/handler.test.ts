@@ -115,3 +115,16 @@ describe("route handler helpers", () => {
     expect(res.body).toEqual({ error: { code: "INTERNAL_ERROR", message: "Something went wrong. Please try again." } });
   });
 });
+
+describe("isDomainError", () => {
+  it("matches by code, including errors from another copy of the module", async () => {
+    vi.resetModules();
+    const { DomainError: OtherCopy } = await import("@/server/domain/errors");
+    const { isDomainError } = await import("@/server/domain/errors");
+    const error = new OtherCopy("PLAN_LIMIT_REACHED", "Upgrade.");
+    expect(isDomainError(error)).toBe(true);
+    expect(isDomainError(error, "PLAN_LIMIT_REACHED")).toBe(true);
+    expect(isDomainError(error, "NOT_FOUND")).toBe(false);
+    expect(isDomainError(new Error("nope"))).toBe(false);
+  });
+});

@@ -1,5 +1,5 @@
 import "server-only";
-import { DomainError } from "@/server/domain/errors";
+import { isDomainError } from "@/server/domain/errors";
 
 export type Gated<T> = { locked: false; data: T } | { locked: true; message: string };
 
@@ -11,7 +11,7 @@ export async function gated<T>(promise: Promise<T>): Promise<Gated<T>> {
   try {
     return { locked: false, data: await promise };
   } catch (error) {
-    if (error instanceof DomainError && error.code === "PLAN_LIMIT_REACHED") return { locked: true, message: error.message };
+    if (isDomainError(error, "PLAN_LIMIT_REACHED")) return { locked: true, message: error.message };
     throw error;
   }
 }
