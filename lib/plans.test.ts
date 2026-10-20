@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { effectivePlan, isTrialExpired, planLimits } from "./plans";
+import { atLimit, describeLimits, effectivePlan, isTrialExpired, PLAN_LIMITS, planLimits } from "./plans";
 
 const now = new Date("2026-10-16T12:00:00.000Z");
 
@@ -31,5 +31,28 @@ describe("planLimits", () => {
     const limits = planLimits({ plan: "pro", trialEndsAt: null }, now);
     expect(limits.maxActiveProjects).toBeNull();
     expect(limits.features.timeline).toBe(true);
+  });
+});
+
+describe("atLimit", () => {
+  it("is never reached when unlimited", () => {
+    expect(atLimit(null, 1_000)).toBe(false);
+  });
+
+  it("is reached once usage equals the limit", () => {
+    expect(atLimit(5, 4)).toBe(false);
+    expect(atLimit(5, 5)).toBe(true);
+  });
+});
+
+describe("describeLimits", () => {
+  it("lists Free's caps and locked features", () => {
+    expect(describeLimits(PLAN_LIMITS.free)).toBe(
+      "up to 5 members and 3 active projects, without timeline, reports, integrations or automations",
+    );
+  });
+
+  it("has nothing to say about an uncapped plan with every feature", () => {
+    expect(describeLimits(PLAN_LIMITS.pro)).toBe("no caps");
   });
 });

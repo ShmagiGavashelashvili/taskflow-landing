@@ -1,12 +1,11 @@
 import "server-only";
-import { planLimits } from "@/lib/plans";
 import type { Automation, AutomationsResponse, Integration, IntegrationsResponse } from "@/lib/schemas/integrations";
 import { AUTOMATION_IDS, automationIdSchema, INTEGRATION_IDS, integrationIdSchema } from "@/lib/schemas/entities";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { AUTOMATIONS, INTEGRATIONS } from "@/server/domain/catalog";
 import { DomainError } from "@/server/domain/errors";
-import { requireFeature } from "@/server/domain/plan-guards";
+import { workspaceCapacity } from "@/server/domain/capacity";
 import type { Workspace } from "@/server/domain/types";
 
 /**
@@ -15,7 +14,7 @@ import type { Workspace } from "@/server/domain/types";
  */
 export function integrationService(container: Container) {
   const available = (workspace: Workspace, feature: "integrations" | "automations") =>
-    planLimits(workspace, container.clock.now()).features[feature];
+    workspaceCapacity(container, workspace).limits.features[feature];
 
   return {
     async listIntegrations(session: AppSession): Promise<IntegrationsResponse> {
@@ -30,7 +29,7 @@ export function integrationService(container: Container) {
       if (!id.success) throw new DomainError("NOT_FOUND", "That integration doesn't exist.");
       const { workspace } = session;
       const now = container.clock.now();
-      requireFeature(workspace, now, "integrations");
+      workspaceCapacity(container, workspace).requireFeature("integrations");
       await container.integrations.upsert({ workspaceId: workspace.id, integrationId: id.data, connected, updatedAt: now.toISOString() });
       return { ...INTEGRATIONS[id.data], connected };
     },
@@ -47,7 +46,7 @@ export function integrationService(container: Container) {
       if (!id.success) throw new DomainError("NOT_FOUND", "That automation doesn't exist.");
       const { workspace } = session;
       const now = container.clock.now();
-      requireFeature(workspace, now, "automations");
+      workspaceCapacity(container, workspace).requireFeature("automations");
       await container.automations.upsert({ workspaceId: workspace.id, automationId: id.data, enabled, updatedAt: now.toISOString() });
       return { ...AUTOMATIONS[id.data], enabled };
     },

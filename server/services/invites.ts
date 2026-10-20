@@ -1,7 +1,6 @@
 import "server-only";
 import { randomBytes, randomUUID } from "node:crypto";
 import type { z } from "zod";
-import { planLimits } from "@/lib/plans";
 import type {
   acceptInviteRequestSchema,
   createInviteRequestSchema,
@@ -13,7 +12,7 @@ import { toPublicUser, type AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
 import { isPending } from "@/server/domain/invites";
-import { requireRoom } from "@/server/domain/plan-guards";
+import { workspaceCapacity } from "@/server/domain/capacity";
 import type { Invite } from "@/server/domain/types";
 import { requireOwner } from "./workspace";
 
@@ -25,11 +24,6 @@ export const inviteUrl = (token: string) => `/invite/${token}`;
 function toPendingInvite(invite: Invite): PendingInvite {
   const { id, email, invitedBy, expiresAt, token } = invite;
   return { id, email, invitedBy, expiresAt, inviteUrl: inviteUrl(token) };
-}
-
-/** The member-limit message for a workspace whose effective plan caps members. */
-function memberLimitMessage(limit: number | null): string {
-  return `Your plan allows up to ${limit} members, including pending invites. Upgrade to Pro for unlimited members.`;
 }
 
 const ASK_FOR_NEW = "Ask the person who invited you for a new one.";
@@ -76,9 +70,7 @@ export function inviteService(container: Container) {
           email: ["This email is already invited. Copy the link from Pending invites below."],
         });
       }
-      const members = await container.memberships.listByWorkspace(workspace.id);
-      const { maxMembers } = planLimits(workspace, now());
-      requireRoom(maxMembers, members.length + pendingInvites.length, memberLimitMessage(maxMembers));
+      await workspaceCapacity(container, workspace).requireRoomToInvite();
 
       const invite = await container.invites.create({
         id: `inv_${randomUUID()}`,
@@ -155,9 +147,7 @@ export function inviteService(container: Container) {
         }
       }
 
-      const members = await container.memberships.listByWorkspace(workspace.id);
-      const { maxMembers } = planLimits(workspace, now());
-      requireRoom(maxMembers, members.length, `${workspace.name} has reached its plan's limit of ${maxMembers} members. Ask the owner to upgrade.`);
+      await workspaceCapacity(container, workspace).requireRoomToJoin(workspace.name);
 
       if (!user) {
         if (input.mode !== "register") throw invalidInvite(); // unreachable: login without an account threw above

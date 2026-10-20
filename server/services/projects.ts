@@ -1,13 +1,12 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import type { z } from "zod";
-import { planLimits } from "@/lib/plans";
 import type { ProjectRef } from "@/lib/schemas/dashboard";
 import type { createProjectRequestSchema, updateProjectRequestSchema } from "@/lib/schemas/projects";
 import type { AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
-import { requireRoom } from "@/server/domain/plan-guards";
+import { workspaceCapacity } from "@/server/domain/capacity";
 import type { Project } from "@/server/domain/types";
 import { requireOwner } from "./workspace";
 
@@ -16,15 +15,7 @@ export const toProjectRef = ({ id, name, color }: Project): ProjectRef => ({ id,
 
 /** Projects in the signed-in user's workspace. Any member can create and edit; only owners delete. */
 export function projectService(container: Container) {
-  async function requireActiveRoom(session: AppSession) {
-    const limit = planLimits(session.workspace, container.clock.now()).maxActiveProjects;
-    const active = await container.projects.list({ workspaceId: session.workspace.id, archived: false });
-    requireRoom(
-      limit,
-      active.length,
-      `Your plan includes ${limit} active projects. Archive one or upgrade to Pro for unlimited projects.`,
-    );
-  }
+  const requireActiveRoom = (session: AppSession) => workspaceCapacity(container, session.workspace).requireRoomForProject();
 
   return {
     list(session: AppSession, query: { archived?: boolean } = {}): Promise<Project[]> {

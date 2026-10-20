@@ -21,6 +21,7 @@ import type { FieldErrors } from "@/lib/api/errors";
 import { workspaceApi } from "@/lib/api/workspace";
 import { describeFailure, validateForm } from "@/lib/forms";
 import { initialsOf } from "@/lib/people";
+import { atLimit } from "@/lib/plans";
 import { createInviteRequestSchema, type Member, type PendingInvite } from "@/lib/schemas/workspace";
 import type { AvatarTone } from "@/types";
 import SettingsSection from "../SettingsSection";
@@ -44,10 +45,10 @@ export default function MembersPanel({ isOwner, currentUserId, members: initialM
   const [lastInvite, setLastInvite] = useState<PendingInvite | null>(null);
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
 
-  const atLimit = memberLimit !== null && members.length + invites.length >= memberLimit;
+  const full = atLimit(memberLimit, members.length + invites.length);
   const upgradeMessage =
     limitMessage ??
-    (atLimit ? `You've reached your plan's limit of ${memberLimit} members, including pending invites.` : null);
+    (full ? `You've reached your plan's limit of ${memberLimit} members, including pending invites.` : null);
 
   return (
     <div className="grid gap-6">
