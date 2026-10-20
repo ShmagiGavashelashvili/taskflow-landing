@@ -11,7 +11,7 @@ import { hashPassword, verifyPassword } from "@/server/auth/password";
 import { toPublicUser, type AppSession } from "@/server/auth/session";
 import type { Container } from "@/server/container";
 import { DomainError } from "@/server/domain/errors";
-import { isPending } from "@/server/domain/invites";
+import { assertUsable, decideAcceptance, invalidInvite, isPending } from "@/server/domain/invites";
 import { workspaceCapacity } from "@/server/domain/capacity";
 import type { Invite } from "@/server/domain/types";
 import { requireOwner } from "./workspace";
@@ -24,19 +24,6 @@ export const inviteUrl = (token: string) => `/invite/${token}`;
 function toPendingInvite(invite: Invite): PendingInvite {
   const { id, email, invitedBy, expiresAt, token } = invite;
   return { id, email, invitedBy, expiresAt, inviteUrl: inviteUrl(token) };
-}
-
-const ASK_FOR_NEW = "Ask the person who invited you for a new one.";
-const invalidInvite = () => new DomainError("INVALID_TOKEN", `This invite link isn't valid. ${ASK_FOR_NEW}`);
-
-/** Throws INVALID_TOKEN with a message saying why the invite can't be used. */
-function assertUsable(invite: Invite | null, now: Date): asserts invite is Invite {
-  if (!invite) throw invalidInvite();
-  if (invite.acceptedAt) {
-    throw new DomainError("INVALID_TOKEN", "This invite has already been used. If it was you, log in instead.");
-  }
-  if (invite.revokedAt) throw new DomainError("INVALID_TOKEN", `This invite was revoked. ${ASK_FOR_NEW}`);
-  if (new Date(invite.expiresAt) <= now) throw new DomainError("INVALID_TOKEN", `This invite has expired. ${ASK_FOR_NEW}`);
 }
 
 /** Invite management for the signed-in owner's workspace, plus the public preview and accept steps. */
@@ -124,41 +111,36 @@ export function inviteService(container: Container) {
       if (!workspace) throw invalidInvite();
       const markUsed = () => container.invites.update(invite.id, { acceptedAt: now().toISOString() });
 
-      let user = await container.users.findByEmail(invite.email);
-      if (input.mode === "register" && user) {
-        throw new DomainError("EMAIL_TAKEN", `An account for ${invite.email} already exists. Log in to accept the invite.`);
-      }
-      if (input.mode === "login") {
-        if (!user) throw new DomainError("INVALID_CREDENTIALS", `There's no account for ${invite.email} yet. Create one instead.`);
-        if (!(await verifyPassword(input.password, user.passwordHash))) {
-          throw new DomainError("INVALID_CREDENTIALS", "That password isn't right.", { password: ["That password isn't right."] });
-        }
-        const memberships = await container.memberships.listByUser(user.id);
-        const existing = memberships.find((m) => m.workspaceId === workspace.id);
-        if (existing) {
-          await markUsed();
-          return { user: toPublicUser(user), workspace, role: existing.role };
-        }
-        if (memberships.length > 0) {
-          throw new DomainError(
-            "CONFLICT",
-            "This account already belongs to another workspace, and TaskFlow supports one workspace per account for now. Ask for an invite to a different email.",
-          );
-        }
-      }
-
-      await workspaceCapacity(container, workspace).requireRoomToJoin(workspace.name);
-
-      if (!user) {
-        if (input.mode !== "register") throw invalidInvite(); // unreachable: login without an account threw above
-        user = await container.users.create({
+      const account = await container.users.findByEmail(invite.email);
+      // Only reached for `join` without an account, which `decideAcceptance` allows only when registering.
+      const registerAccount = async () => {
+        if (input.mode !== "register") throw invalidInvite();
+        return container.users.create({
           id: `usr_${randomUUID()}`,
           name: input.name,
           email: invite.email,
           passwordHash: await hashPassword(input.password),
           createdAt: now().toISOString(),
         });
+      };
+      const decision = decideAcceptance(
+        invite,
+        input.mode === "register"
+          ? { mode: "register", account }
+          : {
+              mode: "login",
+              account: account && { id: account.id, memberships: await container.memberships.listByUser(account.id) },
+              passwordOk: account !== null && (await verifyPassword(input.password, account.passwordHash)),
+            },
+      );
+
+      if (decision.kind === "rejoin") {
+        await markUsed();
+        return { user: toPublicUser(account!), workspace, role: decision.role };
       }
+
+      await workspaceCapacity(container, workspace).requireRoomToJoin(workspace.name);
+      const user = account ?? (await registerAccount());
       const membership = await container.memberships.create({ userId: user.id, workspaceId: workspace.id, role: "member" });
       await markUsed();
       return { user: toPublicUser(user), workspace, role: membership.role };
